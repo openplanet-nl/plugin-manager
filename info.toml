@@ -1,0 +1,7 @@
+[meta]
+name = "Plugin Manager"
+author = "Openplanet"
+category = "Meta"
+
+[script]
+imports = [ "Icons.as" ]
