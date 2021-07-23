@@ -1,9 +1,13 @@
-void PluginUninstall(Meta::Plugin@ plugin)
+void PluginUninstallAsync(ref@ metaPlugin)
 {
+	auto plugin = cast<Meta::Plugin@>(metaPlugin);
 	string pluginSourcePath = plugin.SourcePath;
 
 	Meta::UnloadPlugin(plugin);
 	@plugin = null;
+
+	// Yield once to make sure the plugin is really unloaded, as UnloadPlugin only queues plugins to be unloaded rather than immediately
+	yield();
 
 	trace("Deleting plugin file: \"" + pluginSourcePath + "\"");
 
@@ -70,7 +74,7 @@ void PluginUpdateAsync(ref@ update)
 	}
 
 	// Uninstall the plugin
-	PluginUninstall(installedPlugin);
+	PluginUninstallAsync(installedPlugin);
 	@installedPlugin = null;
 
 	// Install the plugin

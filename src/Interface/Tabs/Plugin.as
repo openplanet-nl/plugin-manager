@@ -149,8 +149,7 @@ class PluginTab : ITab
 
 		// Show the uninstall button
 		if (UI::RedButton("Uninstall")) {
-			PluginUninstall(installedPlugin);
-			@installedPlugin = null;
+			startnew(PluginUninstallAsync, installedPlugin);
 		}
 	}
 
