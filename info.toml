@@ -4,4 +4,4 @@ author = "Openplanet"
 category = "Meta"
 
 [script]
-imports = [ "Icons.as" ]
+imports = [ "Icons.as", "Formatting.as" ]
