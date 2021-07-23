@@ -8,7 +8,11 @@ class Window
 	Window()
 	{
 		AddTab(UpdatesTab());
+
+		AddTab(FeaturedTab());
 		AddTab(PopularTab());
+		AddTab(LastUpdatedTab());
+		AddTab(NewestTab());
 	}
 
 	void AddTab(ITab@ tab, bool select = false)

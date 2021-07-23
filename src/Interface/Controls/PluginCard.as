@@ -22,7 +22,7 @@ namespace Controls
 		UI::Text(plugin.m_name);
 		UI::TextDisabled("By " + TransformUsername(plugin.m_author));
 
-		UI::SetCursorPos(textPos + vec2(width - 40, 10));
+		UI::SetCursorPos(textPos + vec2(width - 40, 5));
 		if (UI::Button("Info")) {
 			g_window.AddTab(PluginTab(plugin.m_siteID), true);
 		}
