@@ -31,7 +31,7 @@ void RemoveAvailableUpdate(AvailableUpdate@ update)
 
 void CheckForUpdatesAsync()
 {
-	print("Checking for plugin updates..");
+	trace("Checking for plugin updates..");
 
 	// Clear list of available updates
 	g_availableUpdates.RemoveRange(0, g_availableUpdates.Length);
@@ -91,5 +91,9 @@ void CheckForUpdatesAsync()
 		au.m_newVersion = siteVersion;
 		au.m_filename = siteFilename;
 		g_availableUpdates.InsertLast(au);
+	}
+
+	if (g_availableUpdates.Length == 0) {
+		trace("No plugin updates found!");
 	}
 }
