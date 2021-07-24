@@ -13,6 +13,9 @@ class CachedImage
 			yield();
 		}
 		@m_texture = Resources::GetTexture(req.Buffer());
+		if (m_texture.GetSize().x == 0) {
+			@m_texture = null;
+		}
 	}
 }
 

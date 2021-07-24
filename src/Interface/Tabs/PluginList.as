@@ -17,7 +17,7 @@ class PluginListTab : ITab
 
 	string GetRequestParams() { return ""; }
 
-	void StartRequest()
+	void Clear()
 	{
 		m_error = false;
 		m_errorMessage = "";
@@ -26,16 +26,26 @@ class PluginListTab : ITab
 		m_page = 0;
 		m_pageCount = 0;
 		m_plugins.RemoveRange(0, m_plugins.Length);
+	}
+
+	void StartRequest()
+	{
+		Clear();
 
 		@m_request = API::Get("files" + GetRequestParams());
 	}
 
-	void CheckRequest()
+	void CheckStartRequest()
 	{
 		// If there's not already a request and the window is appearing, we start a new request
 		if (m_request is null && UI::IsWindowAppearing()) {
 			StartRequest();
 		}
+	}
+
+	void CheckRequest()
+	{
+		CheckStartRequest();
 
 		// If there's a request, check if it has finished
 		if (m_request !is null && m_request.Finished()) {

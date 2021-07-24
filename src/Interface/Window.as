@@ -13,6 +13,7 @@ class Window
 		AddTab(PopularTab());
 		AddTab(LastUpdatedTab());
 		AddTab(NewestTab());
+		AddTab(SearchTab());
 	}
 
 	void AddTab(ITab@ tab, bool select = false)
