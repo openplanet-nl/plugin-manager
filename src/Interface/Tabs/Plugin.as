@@ -201,16 +201,13 @@ class PluginTab : ITab
 
 		UI::TextDisabled("By " + TransformUsername(m_plugin.m_author));
 
-		UI::Separator();
-
-		//TODO: Tags
-		/*
 		for (uint i = 0; i < m_plugin.m_tags.Length; i++) {
 			Controls::PluginTag(m_plugin.m_tags[i]);
 			UI::SameLine();
 		}
 		UI::NewLine();
-		*/
+
+		UI::Separator();
 
 		UI::Markdown(m_plugin.m_description);
 		UI::EndChild();
