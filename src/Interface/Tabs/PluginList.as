@@ -15,7 +15,16 @@ class PluginListTab : ITab
 
 	string GetLabel() { return "Plugins"; }
 
-	string GetRequestParams() { return ""; }
+	void GetRequestParams(dictionary@ params)
+	{
+#if TMNEXT || MPD
+		params.Set("tag", "Trackmania");
+#elif TURBO
+		params.Set("tag", "Turbo");
+#else
+		params.Set("tag", "Maniaplanet");
+#endif
+	}
 
 	void Clear()
 	{
@@ -32,7 +41,23 @@ class PluginListTab : ITab
 	{
 		Clear();
 
-		@m_request = API::Get("files" + GetRequestParams());
+		dictionary params;
+		GetRequestParams(params);
+
+		string urlParams = "";
+		if (!params.IsEmpty()) {
+			auto keys = params.GetKeys();
+			for (uint i = 0; i < keys.Length; i++) {
+				string key = keys[i];
+				string value;
+				params.Get(key, value);
+
+				urlParams += (i == 0 ? "?" : "&");
+				urlParams += key + "=" + Net::UrlEncode(value);
+			}
+		}
+
+		@m_request = API::Get("files" + urlParams);
 	}
 
 	void CheckStartRequest()

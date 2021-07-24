@@ -5,9 +5,10 @@ class SearchTab : PluginListTab
 
 	string GetLabel() override { return Icons::Search + " Search###Search"; }
 
-	string GetRequestParams()
+	void GetRequestParams(dictionary@ params) override
 	{
-		return "?search=" + m_search;
+		PluginListTab::GetRequestParams(params);
+		params.Set("search", m_search);
 	}
 
 	void StartRequest() override

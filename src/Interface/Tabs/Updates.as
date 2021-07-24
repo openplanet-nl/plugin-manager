@@ -10,16 +10,18 @@ class UpdatesTab : PluginListTab
 		return "\\$f77" + Icons::ArrowCircleUp + " " + g_availableUpdates.Length + "\\$z Updates###Updates";
 	}
 
-	string GetRequestParams() override
+	void GetRequestParams(dictionary@ params) override
 	{
-		string ret = "?ids=";
+		PluginListTab::GetRequestParams(params);
+
+		string ids;
 		for (uint i = 0; i < g_availableUpdates.Length; i++) {
 			auto au = g_availableUpdates[i];
 			if (i > 0) {
-				ret += ",";
+				ids += ",";
 			}
-			ret += "" + au.m_siteID;
+			ids += "" + au.m_siteID;
 		}
-		return ret;
+		params.Set("ids", ids);
 	}
 }
