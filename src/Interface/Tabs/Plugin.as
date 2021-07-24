@@ -133,7 +133,7 @@ class PluginTab : ITab
 
 		// If the plugin is not installed yet, we can only install it
 		if (installedPlugin is null) {
-			if (UI::GreenButton("Install")) {
+			if (UI::GreenButton(Icons::Download + " Install")) {
 				startnew(CoroutineFunc(InstallAsync));
 			}
 			return;
@@ -141,14 +141,14 @@ class PluginTab : ITab
 
 		// If there's an update available, show the update button
 		if (GetAvailableUpdate(m_plugin.m_siteID) !is null) {
-			if (UI::GreenButton("Update")) {
+			if (UI::GreenButton(Icons::ArrowCircleUp + " Update")) {
 				startnew(CoroutineFunc(UpdateAsync));
 			}
 			UI::SameLine();
 		}
 
 		// Show the uninstall button
-		if (UI::RedButton("Uninstall")) {
+		if (UI::RedButton(Icons::Stop + " Uninstall")) {
 			startnew(PluginUninstallAsync, installedPlugin);
 		}
 	}
@@ -172,6 +172,7 @@ class PluginTab : ITab
 		const float THUMBNAIL_WIDTH = 250;
 		const float THUMBNAIL_PADDING = 8;
 
+		// Left side of the window
 		UI::BeginChild("Summary", vec2(THUMBNAIL_WIDTH, 0));
 
 		auto img = Images::CachedFromURL("imgu/" + m_plugin.m_siteID + ".jpg?t=" + m_plugin.m_updateTime);
@@ -190,8 +191,13 @@ class PluginTab : ITab
 		UI::Text("Last updated: \\$f77" + Time::FormatString("%F %R", m_plugin.m_updateTime));
 		UI::Text("Posted: \\$f77" + Time::FormatString("%F %R", m_plugin.m_postTime));
 
+		if (UI::Button(Icons::Link + " Open on website")) {
+			OpenBrowserURL(Setting_BaseURL + "files/" + m_plugin.m_siteID);
+		}
+
 		UI::EndChild();
 
+		// Right side of the window
 		UI::SetCursorPos(posTop + vec2(THUMBNAIL_WIDTH + THUMBNAIL_PADDING, 0));
 		UI::BeginChild("Details");
 
