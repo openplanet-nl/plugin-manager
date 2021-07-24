@@ -29,7 +29,7 @@ namespace Controls
 	void Tag(const string &in text, const vec4 &in color = TAG_COLOR)
 	{
 		vec2 textSize = Draw::MeasureString(text);
-		UI::InvisibleButton("##tag", textSize + TAG_PADDING * 2);
+		UI::Dummy(textSize + TAG_PADDING * 2);
 		DrawTag(UI::GetItemRect(), text, color);
 	}
 
