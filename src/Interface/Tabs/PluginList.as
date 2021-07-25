@@ -15,15 +15,33 @@ class PluginListTab : ITab
 
 	string GetLabel() { return "Plugins"; }
 
+	void GetRequestTags(array<string>@ tags)
+	{
+		tags.InsertLast("Modern");
+
+#if TMNEXT || MPD
+		tags.InsertLast("Trackmania");
+#elif TURBO
+		tags.InsertLast("Turbo");
+#else
+		tags.InsertLast("Maniaplanet");
+#endif
+	}
+
 	void GetRequestParams(dictionary@ params)
 	{
-#if TMNEXT || MPD
-		params.Set("tag", "Trackmania");
-#elif TURBO
-		params.Set("tag", "Turbo");
-#else
-		params.Set("tag", "Maniaplanet");
-#endif
+		array<string> tags;
+		GetRequestTags(tags);
+
+		string paramTags = "";
+		for (uint i = 0; i < tags.Length; i++) {
+			if (i > 0) {
+				paramTags += ",";
+			}
+			paramTags += tags[i];
+		}
+
+		params.Set("tags", paramTags);
 	}
 
 	void Clear()
