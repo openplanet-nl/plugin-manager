@@ -1,4 +1,4 @@
 class NewestTab : PluginListTab
 {
-	string GetLabel() override { return Icons::Clock + " Newest###Newest"; }
+	string GetLabel() override { return Icons::ClockO + " Newest###Newest"; }
 }

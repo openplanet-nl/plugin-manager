@@ -23,7 +23,7 @@ class PluginTab : ITab
 	{
 		string ret;
 		if (m_plugin !is null) {
-			ret = Icons::CodeBranch + " " + m_plugin.m_name;
+			ret = Icons::CodeFork + " " + m_plugin.m_name;
 		} else {
 			ret = "...";
 		}

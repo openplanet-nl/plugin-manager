@@ -13,7 +13,7 @@ void RenderMenuMain()
 			g_window.m_visible = !g_window.m_visible;
 		}
 
-		if (UI::MenuItem(Icons::UndoAlt + " Check for updates")) {
+		if (UI::MenuItem(Icons::Refresh + " Check for updates")) {
 			startnew(CheckForUpdatesAsync);
 		}
 
