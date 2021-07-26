@@ -1,4 +1,4 @@
-class PluginTab : ITab
+class PluginTab : Tab
 {
 	Net::HttpRequest@ m_request;
 
@@ -16,10 +16,9 @@ class PluginTab : ITab
 		StartRequest(m_siteID);
 	}
 
-	bool IsVisible() { return true; }
-	bool CanClose() { return !m_updating; }
+	bool CanClose() override { return !m_updating; }
 
-	string GetLabel()
+	string GetLabel() override
 	{
 		string ret;
 		if (m_plugin !is null) {
@@ -153,7 +152,7 @@ class PluginTab : ITab
 		}
 	}
 
-	void Render()
+	void Render() override
 	{
 		CheckRequest();
 

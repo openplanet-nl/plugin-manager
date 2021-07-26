@@ -2,8 +2,9 @@ class Window
 {
 	bool m_visible = false;
 
-	array<ITab@> m_tabs;
-	ITab@ m_selectTab;
+	array<Tab@> m_tabs;
+	Tab@ m_selectTab;
+	Tab@ m_lastActiveTab;
 
 	Window()
 	{
@@ -16,7 +17,7 @@ class Window
 		AddTab(SearchTab());
 	}
 
-	void AddTab(ITab@ tab, bool select = false)
+	void AddTab(Tab@ tab, bool select = false)
 	{
 		m_tabs.InsertLast(tab);
 		if (select) {
@@ -24,7 +25,7 @@ class Window
 		}
 	}
 
-	void RenderTabContents(ITab@ tab)
+	void RenderTabContents(Tab@ tab)
 	{
 		UI::BeginChild("Tab");
 		tab.Render();
@@ -40,6 +41,12 @@ class Window
 
 		UI::SetNextWindowSize(800, 500);
 		if (UI::Begin(Icons::ShoppingCart + " Plugin Manager###PluginManager", m_visible)) {
+			// Push the last active tab style so that the separator line is colored (this is drawn in BeginTabBar)
+			auto lastActiveTab = m_lastActiveTab;
+			if (lastActiveTab !is null) {
+				lastActiveTab.PushTabStyle();
+			}
+
 			UI::BeginTabBar("Tabs");
 
 			for (uint i = 0; i < m_tabs.Length; i++) {
@@ -56,9 +63,12 @@ class Window
 					@m_selectTab = null;
 				}
 
+				tab.PushTabStyle();
+
 				if (tab.CanClose()) {
 					bool open = true;
 					if (UI::BeginTabItem(tab.GetLabel(), open, flags)) {
+						@m_lastActiveTab = tab;
 						RenderTabContents(tab);
 					}
 					if (!open) {
@@ -66,14 +76,22 @@ class Window
 					}
 				} else {
 					if (UI::BeginTabItem(tab.GetLabel(), flags)) {
+						@m_lastActiveTab = tab;
 						RenderTabContents(tab);
 					}
 				}
+
+				tab.PopTabStyle();
 
 				UI::PopID();
 			}
 
 			UI::EndTabBar();
+
+			// We pop the tab style (for the separator line) only after EndTabBar, to satisfy the stack unroller
+			if (lastActiveTab !is null) {
+				lastActiveTab.PopTabStyle();
+			}
 		}
 		UI::End();
 	}

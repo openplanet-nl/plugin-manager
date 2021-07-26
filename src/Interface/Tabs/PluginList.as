@@ -1,4 +1,4 @@
-class PluginListTab : ITab
+class PluginListTab : Tab
 {
 	Net::HttpRequest@ m_request;
 
@@ -10,10 +10,9 @@ class PluginListTab : ITab
 	int m_pageCount;
 	array<PluginInfo@> m_plugins;
 
-	bool IsVisible() { return true; }
-	bool CanClose() { return false; }
+	string GetLabel() override { return "Plugins"; }
 
-	string GetLabel() { return "Plugins"; }
+	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
 
 	void GetRequestTags(array<string>@ tags)
 	{
@@ -126,7 +125,7 @@ class PluginListTab : ITab
 		error("Unable to get plugin list: " + message);
 	}
 
-	void Render()
+	void Render() override
 	{
 		CheckRequest();
 
