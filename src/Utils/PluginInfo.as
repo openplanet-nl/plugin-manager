@@ -33,6 +33,8 @@ class PluginInfo
 	int64 m_updateTime;
 	int m_downloads;
 
+	string m_id;
+
 	array<TagInfo@> m_tags;
 
 	PluginInfo(const Json::Value &in js)
@@ -60,5 +62,31 @@ class PluginInfo
 		for (uint i = 0; i < jsTags.Length; i++) {
 			m_tags.InsertLast(TagInfo(jsTags[i]));
 		}
+
+		if (m_filename.EndsWith(".op")) {
+			m_id = m_filename.SubStr(0, m_filename.Length - 3);
+		} else if (m_filename.EndsWith(".as") && m_filename.StartsWith("Plugin_")) {
+			m_id = m_filename.SubStr(7, m_filename.Length - 7 - 3);
+		}
+	}
+
+	Meta::Plugin@ GetInstalledPlugin()
+	{
+		// Try to match the plugin by site ID first
+		auto ret = Meta::GetPluginFromSiteID(m_siteID);
+		if (ret !is null) {
+			return ret;
+		}
+
+		// If we can't find it by site ID, check by its expected ID and whether its site ID is 0 (to avoid potential conflicts)
+		if (m_id != "") {
+			@ret = Meta::GetPluginFromID(m_id);
+			if (ret !is null && ret.SiteID == 0) {
+				return ret;
+			}
+		}
+
+		// Found nothing
+		return null;
 	}
 }

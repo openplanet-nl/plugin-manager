@@ -10,6 +10,8 @@ class UpdatesTab : PluginListTab
 		return "\\$f77" + Icons::ArrowCircleUp + " " + g_availableUpdates.Length + "\\$z Updates###Updates";
 	}
 
+	vec4 GetColor() override { return vec4(0.6f, 0.2f, 0, 1); }
+
 	void GetRequestParams(dictionary@ params) override
 	{
 		PluginListTab::GetRequestParams(params);

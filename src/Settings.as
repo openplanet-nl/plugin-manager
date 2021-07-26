@@ -9,4 +9,3 @@ int Setting_PluginsPerRow = 3;
 
 [Setting category="Advanced" name="Base URL" description="Only change if you know what you're doing!"]
 string Setting_BaseURL = "https://openplanet.nl/";
-//string Setting_BaseURL = "http://openplanet.c0a80076.nip.io/";

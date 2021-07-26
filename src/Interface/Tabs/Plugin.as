@@ -75,7 +75,7 @@ class PluginTab : Tab
 		}
 
 		// See if this plugin is already installed
-		auto installedPlugin = Meta::GetPluginFromSiteID(m_plugin.m_siteID);
+		auto installedPlugin = m_plugin.GetInstalledPlugin();
 		if (installedPlugin !is null) {
 			// If the installed plugin is a folder type, it's not installable
 			if (installedPlugin.Type == Meta::PluginType::Folder) {
@@ -128,7 +128,7 @@ class PluginTab : Tab
 		}
 
 		// Get installed plugin info
-		auto installedPlugin = Meta::GetPluginFromSiteID(m_plugin.m_siteID);
+		auto installedPlugin = m_plugin.GetInstalledPlugin();
 
 		// If the plugin is not installed yet, we can only install it
 		if (installedPlugin is null) {
