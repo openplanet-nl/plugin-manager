@@ -118,6 +118,7 @@ class PluginTab : Tab
 	{
 		// If the plugin is not installable, don't show any buttons
 		if (!IsInstallable()) {
+			UI::TextDisabled("Not installable");
 			return;
 		}
 
