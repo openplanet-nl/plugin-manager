@@ -37,6 +37,8 @@ class PluginInfo
 
 	array<TagInfo@> m_tags;
 
+	bool m_isInstalled;
+
 	PluginInfo(const Json::Value &in js)
 	{
 		m_siteID = js["id"];
@@ -68,6 +70,8 @@ class PluginInfo
 		} else if (m_filename.EndsWith(".as") && m_filename.StartsWith("Plugin_")) {
 			m_id = m_filename.SubStr(7, m_filename.Length - 7 - 3);
 		}
+
+		CheckIfInstalled();
 	}
 
 	Meta::Plugin@ GetInstalledPlugin()
@@ -88,5 +92,23 @@ class PluginInfo
 
 		// Found nothing
 		return null;
+	}
+
+	void CheckIfInstalled()
+	{
+		m_isInstalled = false;
+
+		// If the plugin is loaded, it's installed
+		if (GetInstalledPlugin() !is null) {
+			m_isInstalled = true;
+			return;
+		}
+
+		// If the file exists in the plugin folder, it's installed
+		string path = IO::FromDataFolder("Plugins/" + m_filename);
+		if (IO::FileExists(path)) {
+			m_isInstalled = true;
+			return;
+		}
 	}
 }

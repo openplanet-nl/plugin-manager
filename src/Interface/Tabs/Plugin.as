@@ -100,6 +100,7 @@ class PluginTab : Tab
 		PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_filename);
 
 		m_plugin.m_downloads++;
+		m_plugin.m_isInstalled = true;
 		m_updating = false;
 	}
 
@@ -111,6 +112,27 @@ class PluginTab : Tab
 		PluginUpdateAsync(au);
 
 		m_plugin.m_downloads++;
+		m_updating = false;
+	}
+
+	void UninstallAsync()
+	{
+		m_updating = true;
+
+		auto installedPlugin = m_plugin.GetInstalledPlugin();
+		if (installedPlugin !is null) {
+			// If the plugin is loaded we can uninstall normally
+			PluginUninstallAsync(installedPlugin);
+		} else {
+			// If the plugin is not loaded (but it is installed) we can just delete the file
+			// This can happen when a plugin is unsigned or there's some other permission-related error
+			string path = IO::FromDataFolder("Plugins/" + m_plugin.m_filename);
+			if (IO::FileExists(path)) {
+				IO::Delete(path);
+			}
+		}
+
+		m_plugin.m_isInstalled = false;
 		m_updating = false;
 	}
 
@@ -128,11 +150,8 @@ class PluginTab : Tab
 			return;
 		}
 
-		// Get installed plugin info
-		auto installedPlugin = m_plugin.GetInstalledPlugin();
-
 		// If the plugin is not installed yet, we can only install it
-		if (installedPlugin is null) {
+		if (!m_plugin.m_isInstalled) {
 			if (UI::GreenButton(Icons::Download + " Install")) {
 				startnew(CoroutineFunc(InstallAsync));
 			}
@@ -149,7 +168,7 @@ class PluginTab : Tab
 
 		// Show the uninstall button
 		if (UI::RedButton(Icons::Stop + " Uninstall")) {
-			startnew(PluginUninstallAsync, installedPlugin);
+			startnew(CoroutineFunc(UninstallAsync));
 		}
 	}
 
