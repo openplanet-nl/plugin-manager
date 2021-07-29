@@ -3,13 +3,13 @@ void PluginUninstallAsync(ref@ metaPlugin)
 	auto plugin = cast<Meta::Plugin@>(metaPlugin);
 	string pluginSourcePath = plugin.SourcePath;
 
+	warn("Uninstalling plugin " + plugin.Name);
+
 	Meta::UnloadPlugin(plugin);
 	@plugin = null;
 
 	// Yield once to make sure the plugin is really unloaded, as UnloadPlugin only queues plugins to be unloaded rather than immediately
 	yield();
-
-	trace("Deleting plugin file: \"" + pluginSourcePath + "\"");
 
 	IO::Delete(pluginSourcePath);
 }
@@ -44,7 +44,6 @@ void PluginInstallAsync(int siteID, const string &in filename)
 	}
 
 	// Save the file
-	trace("Saving plugin file: \"" + savePath + "\"");
 	req.SaveToFile(savePath);
 
 	// Load the plugin

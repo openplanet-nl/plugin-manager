@@ -100,7 +100,7 @@ class PluginTab : Tab
 		PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_filename);
 
 		m_plugin.m_downloads++;
-		m_plugin.m_isInstalled = true;
+		m_plugin.CheckIfInstalled();
 		m_updating = false;
 	}
 
