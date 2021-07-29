@@ -125,6 +125,10 @@ class PluginListTab : Tab
 		error("Unable to get plugin list: " + message);
 	}
 
+	void RenderEmpty()
+	{
+	}
+
 	void Render() override
 	{
 		CheckRequest();
@@ -136,6 +140,11 @@ class PluginListTab : Tab
 
 		if (m_error) {
 			UI::Text("\\$f77" + Icons::ExclamationTriangle + "\\$z Unable to get plugin list! " + m_errorMessage);
+			return;
+		}
+
+		if (m_plugins.Length == 0) {
+			RenderEmpty();
 			return;
 		}
 

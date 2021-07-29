@@ -9,6 +9,7 @@ class Window
 	Window()
 	{
 		AddTab(UpdatesTab());
+		AddTab(InstalledTab());
 
 		AddTab(FeaturedTab());
 		AddTab(PopularTab());
