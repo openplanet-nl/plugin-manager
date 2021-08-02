@@ -10,13 +10,20 @@ class InstalledTab : PluginListTab
 
 		auto plugins = Meta::AllPlugins();
 
-		string ids;
+		array<int> ids;
 		for (uint i = 0; i < plugins.Length; i++) {
 			auto au = plugins[i];
-			if (i > 0) {
-				ids += ",";
+			if (au.SiteID > 0) {
+				ids.InsertLast(au.SiteID);
 			}
-			ids += "" + au.SiteID;
+		}
+
+		string listIds = "";
+		for (uint i = 0; i < ids.Length; i++) {
+			if (i > 0) {
+				listIds += ",";
+			}
+			listIds += tostring(ids[i]);
 		}
 		params.Set("ids", ids);
 	}
