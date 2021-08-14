@@ -4,6 +4,18 @@ class InstalledTab : PluginListTab
 
 	vec4 GetColor() override { return Tab::GetColor(); }
 
+	bool HasPluginsInstalled()
+	{
+		auto plugins = Meta::AllPlugins();
+		for (uint i = 0; i < plugins.Length; i++) {
+			auto au = plugins[i];
+			if (au.SiteID > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	void GetRequestParams(dictionary@ params) override
 	{
 		PluginListTab::GetRequestParams(params);
@@ -25,7 +37,16 @@ class InstalledTab : PluginListTab
 			}
 			listIds += tostring(ids[i]);
 		}
-		params.Set("ids", ids);
+		params.Set("ids", listIds);
+	}
+
+	void StartRequest() override
+	{
+		if (!HasPluginsInstalled()) {
+			return;
+		}
+
+		PluginListTab::StartRequest();
 	}
 
 	void RenderEmpty() override
