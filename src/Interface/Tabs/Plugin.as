@@ -46,6 +46,11 @@ class PluginTab : Tab
 			@m_request = null;
 			auto js = Json::Parse(res);
 
+			if (js.GetType() != Json::Type::Object) {
+				HandleErrorResponse("Response is not an object: \"" + res + "\"");
+				return;
+			}
+
 			// Handle the response
 			if (js.HasKey("error")) {
 				HandleErrorResponse(js["error"]);
