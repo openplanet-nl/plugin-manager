@@ -74,7 +74,7 @@ class PluginListTab : Tab
 			}
 		}
 
-		@m_request = API::Get("files" + urlParams);
+		@m_request = API::Get("plugins" + urlParams);
 	}
 
 	void CheckStartRequest()

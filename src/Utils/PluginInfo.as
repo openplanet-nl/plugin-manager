@@ -17,6 +17,7 @@ class TagInfo
 class PluginInfo
 {
 	int m_siteID;
+	string m_id;
 
 	string m_name;
 	string m_author;
@@ -26,14 +27,17 @@ class PluginInfo
 	string m_description;
 	string m_donateURL;
 
-	string m_filename;
 	uint m_filesize;
+	bool m_signed;
 
 	int64 m_postTime;
 	int64 m_updateTime;
 	int m_downloads;
 
-	string m_id;
+	string m_image;
+	string m_url;
+
+	array<string> m_screenshots;
 
 	array<TagInfo@> m_tags;
 
@@ -42,6 +46,7 @@ class PluginInfo
 	PluginInfo(const Json::Value &in js)
 	{
 		m_siteID = js["id"];
+		m_id = js["identifier"];
 
 		m_name = js["name"];
 		m_author = js["author"];
@@ -53,22 +58,27 @@ class PluginInfo
 		}
 		m_donateURL = js["donateurl"];
 
-		m_filename = js["filename"];
 		m_filesize = js["filesize"];
+		m_signed = js["signed"];
 
 		m_postTime = js["posttime"];
 		m_updateTime = js["updatetime"];
 		m_downloads = js["downloads"];
 
+		m_image = js["image"];
+		m_url = js["url"];
+
+		auto jsScreenshots = js["screenshots"];
+		for (uint i = 0; i < jsScreenshots.Length; i++) {
+			auto jsScreenshot = jsScreenshots[i];
+			if (jsScreenshot.GetType() == Json::Type::String) {
+				m_screenshots.InsertLast(jsScreenshot);
+			}
+		}
+
 		auto jsTags = js["tags"];
 		for (uint i = 0; i < jsTags.Length; i++) {
 			m_tags.InsertLast(TagInfo(jsTags[i]));
-		}
-
-		if (m_filename.EndsWith(".op")) {
-			m_id = m_filename.SubStr(0, m_filename.Length - 3);
-		} else if (m_filename.EndsWith(".as") && m_filename.StartsWith("Plugin_")) {
-			m_id = m_filename.SubStr(7, m_filename.Length - 7 - 3);
 		}
 
 		CheckIfInstalled();
@@ -105,7 +115,7 @@ class PluginInfo
 		}
 
 		// If the file exists in the plugin folder, it's installed
-		string path = IO::FromDataFolder("Plugins/" + m_filename);
+		string path = IO::FromDataFolder("Plugins/" + m_id + ".op");
 		if (IO::FileExists(path)) {
 			m_isInstalled = true;
 			return;

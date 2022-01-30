@@ -21,7 +21,7 @@ void PluginInstallAsync(int siteID, const string &in filename)
 	// Start downloading the plugin
 	auto req = Net::HttpRequest();
 	req.Method = Net::HttpMethod::Get;
-	req.Url = Setting_BaseURL + "files/get/" + siteID;
+	req.Url = Setting_BaseURL + "plugin/" + siteID + "/download";
 	req.Start();
 
 	// Wait for the download to finish

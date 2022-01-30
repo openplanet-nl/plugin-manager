@@ -5,6 +5,9 @@ namespace API
 		auto ret = Net::HttpRequest();
 		ret.Method = Net::HttpMethod::Get;
 		ret.Url = Setting_BaseURL + "api/" + path;
+		if (Setting_VerboseLog) {
+			trace("API request: " + ret.Url);
+		}
 		ret.Start();
 		return ret;
 	}

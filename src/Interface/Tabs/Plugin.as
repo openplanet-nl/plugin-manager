@@ -34,7 +34,7 @@ class PluginTab : Tab
 		m_error = false;
 		m_errorMessage = "";
 
-		@m_request = API::Get("file/" + siteID);
+		@m_request = API::Get("plugin/" + siteID);
 	}
 
 	void CheckRequest()
@@ -93,16 +93,14 @@ class PluginTab : Tab
 			}
 		}
 
-		// Must be a packaged plugin or a legacy script
-		return m_plugin.m_filename.EndsWith(".op") ||
-		       m_plugin.m_filename.EndsWith(".as");
+		return true;
 	}
 
 	void InstallAsync()
 	{
 		m_updating = true;
 
-		PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_filename);
+		PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_id + ".op");
 
 		m_plugin.m_downloads++;
 		m_plugin.CheckIfInstalled();
@@ -131,7 +129,7 @@ class PluginTab : Tab
 		} else {
 			// If the plugin is not loaded (but it is installed) we can just delete the file
 			// This can happen when a plugin is unsigned or there's some other permission-related error
-			string path = IO::FromDataFolder("Plugins/" + m_plugin.m_filename);
+			string path = IO::FromDataFolder("Plugins/" + m_plugin.m_id + ".op");
 			if (IO::FileExists(path)) {
 				IO::Delete(path);
 			}
@@ -196,13 +194,15 @@ class PluginTab : Tab
 		const float THUMBNAIL_WIDTH = 250;
 		const float THUMBNAIL_PADDING = 8;
 
+		const int SCREENSHOTS_PER_ROW = 3;
+
 		// Left side of the window
 		UI::BeginChild("Summary", vec2(THUMBNAIL_WIDTH, 0));
 
-		auto img = Images::CachedFromURL("imgu/" + m_plugin.m_siteID + ".jpg?t=" + m_plugin.m_updateTime);
-		if (img.m_texture !is null) {
-			vec2 thumbSize = img.m_texture.GetSize();
-			UI::Image(img.m_texture, vec2(
+		auto imgThumbnail = Images::CachedFromURL(m_plugin.m_image);
+		if (imgThumbnail.m_texture !is null) {
+			vec2 thumbSize = imgThumbnail.m_texture.GetSize();
+			UI::Image(imgThumbnail.m_texture, vec2(
 				THUMBNAIL_WIDTH,
 				thumbSize.y / (thumbSize.x / THUMBNAIL_WIDTH)
 			));
@@ -210,13 +210,13 @@ class PluginTab : Tab
 
 		RenderUpdatebuttons();
 
-		UI::Text("Filename: \\$f77" + m_plugin.m_filename);
+		UI::Text("Filename: \\$f77" + m_plugin.m_id + ".op");
 		UI::Text("Downloads: \\$f77" + m_plugin.m_downloads);
 		UI::Text("Last updated: \\$f77" + Time::FormatString("%F %R", m_plugin.m_updateTime));
 		UI::Text("Posted: \\$f77" + Time::FormatString("%F %R", m_plugin.m_postTime));
 
 		if (UI::Button(Icons::Link + " Open on website")) {
-			OpenBrowserURL(Setting_BaseURL + "files/" + m_plugin.m_siteID);
+			OpenBrowserURL(Setting_BaseURL + m_plugin.m_url);
 		}
 
 		if (m_plugin.m_donateURL != "" && UI::ColoredButton(Icons::Heart + " Support the author", 0.8f)) {
@@ -233,13 +233,45 @@ class PluginTab : Tab
 		UI::Text(m_plugin.m_name);
 		UI::PopFont();
 
-		UI::TextDisabled("By " + TransformUsername(m_plugin.m_author));
+		UI::TextDisabled("Version " + m_plugin.m_version.ToString() + " by " + TransformUsername(m_plugin.m_author));
 
 		for (uint i = 0; i < m_plugin.m_tags.Length; i++) {
 			Controls::PluginTag(m_plugin.m_tags[i]);
 			UI::SameLine();
 		}
 		UI::NewLine();
+
+		if (m_plugin.m_screenshots.Length > 0) {
+			UI::Separator();
+
+			if (UI::BeginTable("Screenshots", SCREENSHOTS_PER_ROW, UI::TableColumnFlags::WidthStretch)) {
+				const float WINDOW_PADDING = 8;
+				const float COL_SPACING = 4;
+
+				float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (SCREENSHOTS_PER_ROW - 1)) / float(SCREENSHOTS_PER_ROW);
+
+				for (uint i = 0; i < m_plugin.m_screenshots.Length; i++) {
+					string screenshot = m_plugin.m_screenshots[i];
+					UI::TableNextColumn();
+					auto imgScreenshot = Images::CachedFromURL(screenshot);
+					if (imgScreenshot.m_texture !is null) {
+						vec2 imgSize = imgScreenshot.m_texture.GetSize();
+						UI::Image(imgScreenshot.m_texture, vec2(
+							colWidth,
+							imgSize.y / (imgSize.x / colWidth)
+						));
+
+						if (UI::IsItemHovered()) {
+							UI::BeginTooltip();
+							UI::Image(imgScreenshot.m_texture, imgSize / 2.0f);
+							UI::EndTooltip();
+						}
+					}
+				}
+
+				UI::EndTable();
+			}
+		}
 
 		UI::Separator();
 

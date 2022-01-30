@@ -5,3 +5,4 @@ category = "Meta"
 
 [script]
 imports = [ "Icons.as", "Formatting.as" ]
+timeout = 0

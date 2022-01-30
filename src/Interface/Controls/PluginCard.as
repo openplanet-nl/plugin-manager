@@ -8,7 +8,7 @@ namespace Controls
 		vec2 imagePos = UI::GetCursorPos();
 		imagePos.y -= UI::GetScrollY(); // GetCursorPos doesn't include the scrolling offset
 
-		auto img = Images::CachedFromURL("imgu/" + plugin.m_siteID + ".jpg?t=" + plugin.m_updateTime);
+		auto img = Images::CachedFromURL(plugin.m_image);
 		if (img.m_texture !is null) {
 			vec2 thumbSize = img.m_texture.GetSize();
 			UI::Image(img.m_texture, vec2(

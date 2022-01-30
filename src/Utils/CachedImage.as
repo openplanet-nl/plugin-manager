@@ -8,6 +8,9 @@ class CachedImage
 		auto req = Net::HttpRequest();
 		req.Method = Net::HttpMethod::Get;
 		req.Url = m_url;
+		if (Setting_VerboseLog) {
+			trace("Download image: " + req.Url);
+		}
 		req.Start();
 		while (!req.Finished()) {
 			yield();
