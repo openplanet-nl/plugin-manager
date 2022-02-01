@@ -97,3 +97,13 @@ void CheckForUpdatesAsync()
 		trace("No plugin updates found!");
 	}
 }
+
+void CheckForUpdatesAsyncStartUp() {
+	CheckForUpdatesAsync();
+	if (g_availableUpdates.Length > 0 && Setting_PerformAutoUpdates) {
+		for (uint i = 0; i < g_availableUpdates.Length; i++) {
+			auto au = g_availableUpdates[i];
+			startnew(PluginUpdateAsync, au);
+		}
+	}
+}

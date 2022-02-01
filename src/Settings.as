@@ -12,3 +12,6 @@ string Setting_BaseURL = "http://opdev.local/";
 
 [Setting category="Advanced" name="Verbose API log"]
 bool Setting_VerboseLog = false;
+
+[Setting category="Advanced" name="Auto-update plugins (only at game start)"]
+bool Setting_PerformAutoUpdates = false;
