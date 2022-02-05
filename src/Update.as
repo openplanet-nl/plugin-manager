@@ -29,25 +29,12 @@ void PluginInstallAsync(int siteID, const string &in filename)
 		yield();
 	}
 
-	// Find out where to save it to
-	string savePath;
-	auto pluginType = Meta::PluginType::Unknown;
-	if (filename.EndsWith(".op")) {
-		savePath = IO::FromDataFolder("Plugins/" + filename);
-		pluginType = Meta::PluginType::Zip;
-	} else if (filename.EndsWith(".as")) {
-		savePath = IO::FromDataFolder("Scripts/" + filename);
-		pluginType = Meta::PluginType::Legacy;
-	} else {
-		error("Don't know where to install plugin with site ID " + siteID + " to! (Filename: \"" + filename + "\")");
-		return;
-	}
-
 	// Save the file
+	string savePath = IO::FromDataFolder("Plugins/" + filename);
 	req.SaveToFile(savePath);
 
 	// Load the plugin
-	Meta::LoadPlugin(savePath, Meta::PluginSource::UserFolder, pluginType);
+	Meta::LoadPlugin(savePath, Meta::PluginSource::UserFolder, Meta::PluginType::Zip);
 }
 
 void PluginUpdateAsync(ref@ update)
