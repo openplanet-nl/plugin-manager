@@ -93,12 +93,15 @@ class PluginListTab : Tab
 		if (m_request !is null && m_request.Finished()) {
 			// Parse the response
 			string res = m_request.String();
+			int resCode = m_request.ResponseCode();
 			@m_request = null;
 			auto js = Json::Parse(res);
 
 			// Handle the response
-			if (js.HasKey("error")) {
-				HandleErrorResponse(js["error"]);
+			if (js.GetType() != Json::Type::Object) {
+				HandleErrorResponse(res, resCode);
+			} else if (js.HasKey("error")) {
+				HandleErrorResponse(js["error"], resCode);
 			} else {
 				HandleResponse(js);
 			}
@@ -117,12 +120,12 @@ class PluginListTab : Tab
 		}
 	}
 
-	void HandleErrorResponse(const string &in message)
+	void HandleErrorResponse(const string &in message, int code)
 	{
 		m_error = true;
 		m_errorMessage = message;
 
-		error("Unable to get plugin list: " + message);
+		error("Unable to get plugin list: " + message + " (code " + code + ")");
 	}
 
 	void RenderEmpty()

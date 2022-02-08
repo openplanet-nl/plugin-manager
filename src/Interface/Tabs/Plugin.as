@@ -43,17 +43,15 @@ class PluginTab : Tab
 		if (m_request !is null && m_request.Finished()) {
 			// Parse the response
 			string res = m_request.String();
+			int resCode = m_request.ResponseCode();
 			@m_request = null;
 			auto js = Json::Parse(res);
 
-			if (js.GetType() != Json::Type::Object) {
-				HandleErrorResponse("Response is not an object: \"" + res + "\"");
-				return;
-			}
-
 			// Handle the response
-			if (js.HasKey("error")) {
-				HandleErrorResponse(js["error"]);
+			if (js.GetType() != Json::Type::Object) {
+				HandleErrorResponse(res, resCode);
+			} else if (js.HasKey("error")) {
+				HandleErrorResponse(js["error"], resCode);
 			} else {
 				HandleResponse(js);
 			}
@@ -65,12 +63,12 @@ class PluginTab : Tab
 		@m_plugin = PluginInfo(js);
 	}
 
-	void HandleErrorResponse(const string &in message)
+	void HandleErrorResponse(const string &in message, int code)
 	{
 		m_error = true;
 		m_errorMessage = message;
 
-		error("Unable to get plugin: " + message);
+		error("Unable to get plugin: " + message + " (code " + code + ")");
 	}
 
 	bool IsInstallable()
