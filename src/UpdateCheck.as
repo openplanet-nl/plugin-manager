@@ -57,6 +57,9 @@ void CheckForUpdatesAsync()
 	if (js.GetType() == Json::Type::Object) {
 		error("Unable to check for updates: \"" + string(js["error"]) + "\"");
 		return;
+	} else if (js.GetType() != Json::Type::Array) {
+		error("Unable to check for updates, unexpected response from server!");
+		return;
 	}
 
 	// Go through returned list of versions
