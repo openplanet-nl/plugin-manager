@@ -2,6 +2,10 @@ namespace API
 {
 	Net::HttpRequest@ Get(const string &in path)
 	{
+		if (!Setting_BaseURL.EndsWith("/")) {
+			Setting_BaseURL += "/";
+		}
+
 		auto ret = Net::HttpRequest();
 		ret.Method = Net::HttpMethod::Get;
 		ret.Url = Setting_BaseURL + "api/" + path;
