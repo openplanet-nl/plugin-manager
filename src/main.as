@@ -6,7 +6,7 @@ void Main()
 	@g_fontHeader = Resources::GetFont("DroidSans-Bold.ttf", 24);
 
 	// Start checking for updates immediately
-	CheckForUpdatesAsync();
+	CheckForUpdatesAsyncStartUp();
 
 	// Every 30 minutes, check for updates again
 	while (true) {
