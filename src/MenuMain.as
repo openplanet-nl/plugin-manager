@@ -1,3 +1,5 @@
+// Competition build can't use plugin manager
+#if !COMPETITION
 void RenderMenuMain()
 {
 	string menuText;
@@ -40,3 +42,4 @@ void RenderMenuMain()
 		UI::EndMenu();
 	}
 }
+#endif
