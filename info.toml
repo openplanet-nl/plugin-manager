@@ -2,6 +2,7 @@
 name = "Plugin Manager"
 author = "Openplanet"
 category = "Meta"
+essential = true
 
 [script]
 imports = [ "Icons.as", "Formatting.as" ]
