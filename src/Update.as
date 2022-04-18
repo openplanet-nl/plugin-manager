@@ -12,6 +12,15 @@ void PluginUninstallAsync(ref@ metaPlugin)
 	yield();
 
 	IO::Delete(pluginSourcePath);
+
+	// Remove from list of available updates, if it exists
+	for (uint i = 0; i < g_availableUpdates.Length; i++) {
+		auto au = g_availableUpdates[i];
+		if (au.m_siteID == plugin.SiteID) {
+			RemoveAvailableUpdate(au);
+			break;
+		}
+	}
 }
 
 void PluginInstallAsync(int siteID, const string &in filename)
