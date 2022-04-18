@@ -39,7 +39,8 @@ class SearchTab : PluginListTab
 	void Render() override
 	{
 		bool changed = false;
-		m_search = UI::InputText("Search", m_search, changed);
+		UI::Text("Search:");
+		m_search = UI::InputText("##Search", m_search, changed);
 		if (changed) {
 			m_typingStart = Time::Now;
 			Clear();
