@@ -122,8 +122,20 @@ class PluginTab : Tab
 
 		auto installedPlugin = m_plugin.GetInstalledPlugin();
 		if (installedPlugin !is null) {
+			// Remember site ID
+			int pluginSiteID = installedPlugin.SiteID;
+
 			// If the plugin is loaded we can uninstall normally
 			PluginUninstallAsync(installedPlugin);
+
+			// Remove from list of available updates, if it exists
+			for (uint i = 0; i < g_availableUpdates.Length; i++) {
+				auto au = g_availableUpdates[i];
+				if (au.m_siteID == pluginSiteID) {
+					RemoveAvailableUpdate(au);
+					break;
+				}
+			}
 		} else {
 			// If the plugin is not loaded (but it is installed) we can just delete the file
 			// This can happen when a plugin is unsigned or there's some other permission-related error
