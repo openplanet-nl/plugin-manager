@@ -1,9 +1,9 @@
-Resources::Font@ g_fontHeader;
+UI::Font@ g_fontHeader;
 
 void Main()
 {
 	// Load header font
-	@g_fontHeader = Resources::GetFont("DroidSans-Bold.ttf", 24);
+	@g_fontHeader = UI::LoadFont("DroidSans-Bold.ttf", 24);
 
 	// Start checking for updates immediately
 	CheckForUpdatesAsyncStartUp();
