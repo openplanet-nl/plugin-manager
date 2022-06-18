@@ -25,10 +25,7 @@ void RenderMenuMain()
 			UI::TextDisabled("No updates available!");
 		} else {
 			if (UI::MenuItem("\\$9f3" + Icons::ArrowCircleUp + " Update all plugins")) {
-				for (uint i = 0; i < g_availableUpdates.Length; i++) {
-					auto au = g_availableUpdates[i];
-					startnew(PluginUpdateAsync, au);
-				}
+				startnew(UpdateAllPluginsAsync);
 			}
 
 			for (uint i = 0; i < g_availableUpdates.Length; i++) {

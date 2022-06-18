@@ -14,7 +14,7 @@ void PluginUninstallAsync(ref@ metaPlugin)
 	IO::Delete(pluginSourcePath);
 }
 
-void PluginInstallAsync(int siteID, const string &in filename)
+void PluginInstallAsync(int siteID, const string &in filename, bool load = true)
 {
 	warn("Installing plugin with site ID " + siteID + " and filename \"" + filename + "\"");
 
@@ -33,8 +33,10 @@ void PluginInstallAsync(int siteID, const string &in filename)
 	string savePath = IO::FromDataFolder("Plugins/" + filename);
 	req.SaveToFile(savePath);
 
-	// Load the plugin
-	Meta::LoadPlugin(savePath, Meta::PluginSource::UserFolder, Meta::PluginType::Zip);
+	if (load) {
+		// Load the plugin
+		Meta::LoadPlugin(savePath, Meta::PluginSource::UserFolder, Meta::PluginType::Zip);
+	}
 }
 
 void PluginUpdateAsync(ref@ update)
@@ -47,25 +49,55 @@ void PluginUpdateAsync(ref@ update)
 		return;
 	}
 
-	Meta::PluginSource pluginSource;
-	Meta::PluginType pluginType;
-	string pluginPath;
-
 	auto installedPlugin = Meta::GetPluginFromSiteID(au.m_siteID);
-	if (installedPlugin !is null) {
-		// Remember where the plugin came from
-		pluginSource = installedPlugin.Source;
-		pluginType = installedPlugin.Type;
-		pluginPath = installedPlugin.SourcePath;
-	}
 
-	// Uninstall the plugin
+	// Gather dependency index
+	auto index = Meta::PluginIndex();
+	index.AddTree(installedPlugin);
+	index.DependencySort();
+
+	// Uninstall the plugin (this will also unload dependents)
 	PluginUninstallAsync(installedPlugin);
 	@installedPlugin = null;
 
-	// Install the plugin
-	PluginInstallAsync(au.m_siteID, au.m_filename);
+	// Install the plugin without loading it
+	PluginInstallAsync(au.m_siteID, au.m_filename, false);
+
+	// Load all plugins in the sorted index
+	int count = index.GetCount();
+	for (int i = 0; i < count; i++) {
+		auto item = index.GetItem(i);
+		Meta::LoadPlugin(item.Path, item.Source, item.Type);
+	}
 
 	// Unmark this available update
 	RemoveAvailableUpdate(au);
+}
+
+void UpdateAllPluginsAsync()
+{
+	// Gather dependency index for each plugin that we are updating
+	auto index = Meta::PluginIndex();
+	for (uint i = 0; i < g_availableUpdates.Length; i++) {
+		auto au = g_availableUpdates[i];
+		index.AddTree(Meta::GetPluginFromSiteID(au.m_siteID));
+	}
+	index.DependencySort();
+
+	// Uninstall and install the new version of each plugin
+	for (uint i = 0; i < g_availableUpdates.Length; i++) {
+		auto au = g_availableUpdates[i];
+		PluginUninstallAsync(Meta::GetPluginFromSiteID(au.m_siteID));
+		PluginInstallAsync(au.m_siteID, au.m_filename, false);
+	}
+
+	// Load all plugins in the sorted index
+	int count = index.GetCount();
+	for (int i = 0; i < count; i++) {
+		auto item = index.GetItem(i);
+		Meta::LoadPlugin(item.Path, item.Source, item.Type);
+	}
+
+	// Clear list of available updates
+	g_availableUpdates.RemoveRange(0, g_availableUpdates.Length);
 }
