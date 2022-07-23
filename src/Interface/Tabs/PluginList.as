@@ -62,9 +62,10 @@ class PluginListTab : Tab
 		StartRequestForPage(0);
 	}
 
-	void StartRequestForPage(int page) {
+	void StartRequestForPage(int page)
+	{
 		dictionary params;
-		params['page'] = '' + page;
+		params['page'] = tostring(page);
 		GetRequestParams(params);
 
 		string urlParams = "";
@@ -146,7 +147,6 @@ class PluginListTab : Tab
 
 		if (m_request !is null && m_pageCount == 0) {
 			UI::Text("Loading list..");
-			m_lastPageRequestFinished = Time::Now;
 			return;
 		}
 
@@ -176,7 +176,7 @@ class PluginListTab : Tab
 			if (haveMorePages) {
 				UI::TableNextRow(UI::TableRowFlags::None, rowHeight);
 				UI::TableNextColumn();
-				string infiniteScrollMsg = (m_request is null ? "Scroll to Load" : "Loading") + " Page " + (m_page + 2);
+				string infiniteScrollMsg = (m_request is null ? "Scroll to load" : "Loading") + " page " + (m_page + 2);
 				UI::Dummy(vec2(0, rowHeight / 3.0));
 				UI::Text(infiniteScrollMsg);
 			}
