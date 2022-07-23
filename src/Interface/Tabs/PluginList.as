@@ -10,6 +10,8 @@ class PluginListTab : Tab
 	int m_pageCount;
 	array<PluginInfo@> m_plugins;
 
+	uint m_lastPageRequestFinished = 0;
+
 	string GetLabel() override { return "Plugins"; }
 
 	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
@@ -57,8 +59,12 @@ class PluginListTab : Tab
 	void StartRequest()
 	{
 		Clear();
+		StartRequestForPage(0);
+	}
 
+	void StartRequestForPage(int page) {
 		dictionary params;
+		params['page'] = '' + page;
 		GetRequestParams(params);
 
 		string urlParams = "";
@@ -118,6 +124,8 @@ class PluginListTab : Tab
 		for (uint i = 0; i < jsItems.Length; i++) {
 			m_plugins.InsertLast(PluginInfo(jsItems[i]));
 		}
+
+		m_lastPageRequestFinished = Time::Now;
 	}
 
 	void HandleErrorResponse(const string &in message, int code)
@@ -136,8 +144,9 @@ class PluginListTab : Tab
 	{
 		CheckRequest();
 
-		if (m_request !is null) {
+		if (m_request !is null && m_pageCount == 0) {
 			UI::Text("Loading list..");
+			m_lastPageRequestFinished = Time::Now;
 			return;
 		}
 
@@ -159,7 +168,26 @@ class PluginListTab : Tab
 				UI::TableNextColumn();
 				Controls::PluginCard(m_plugins[i], colWidth);
 			}
+
+			float rowHeight = Math::Ceil(UI::GetScrollMaxY() / (m_plugins.Length / Setting_PluginsPerRow + 1));
+
+			// draw a message before we check for being near the end
+			bool haveMorePages = m_page + 1 < m_pageCount;
+			if (haveMorePages) {
+				UI::TableNextRow(UI::TableRowFlags::None, rowHeight);
+				UI::TableNextColumn();
+				string infiniteScrollMsg = (m_request is null ? "Scroll to Load" : "Loading") + " Page " + (m_page + 2);
+				UI::Dummy(vec2(0, rowHeight / 3.0));
+				UI::Text(infiniteScrollMsg);
+			}
 			UI::EndTable();
+
+			// after >500ms since the last request, get the next page if there is excess vertical space or when we scroll to just a bit before the final row is in view
+			bool waitedLongEnough = m_lastPageRequestFinished + 500 < Time::Now;
+			bool scrolledNearEnd = UI::GetScrollMaxY() == 0 || UI::GetScrollY() > (UI::GetScrollMaxY() - rowHeight);
+			if (waitedLongEnough && scrolledNearEnd && haveMorePages && m_request is null) {
+				StartRequestForPage(m_page + 1);
+			}
 		}
 	}
 }
