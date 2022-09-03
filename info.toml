@@ -5,5 +5,4 @@ category = "Meta"
 essential = true
 
 [script]
-imports = [ "Icons.as", "Formatting.as" ]
 timeout = 0
