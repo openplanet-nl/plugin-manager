@@ -23,10 +23,9 @@ AvailableUpdate@ GetAvailableUpdate(int siteId)
 void RemoveAvailableUpdate(AvailableUpdate@ update)
 {
 	int index = g_availableUpdates.FindByRef(update);
-	if (index == -1) {
-		return;
+	if (index != -1) {
+		g_availableUpdates.RemoveAt(index);
 	}
-	g_availableUpdates.RemoveAt(index);
 }
 
 void CheckForUpdatesAsync()
