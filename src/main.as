@@ -5,6 +5,9 @@ void Main()
 	// Load header font
 	@g_fontHeader = UI::LoadFont("DroidSans.ttf", 26);
 
+	// Load plugin cache
+	PluginCache::Initialize();
+
 	// Start checking for updates immediately
 	CheckForUpdatesAsyncStartUp();
 

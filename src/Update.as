@@ -2,6 +2,7 @@ void PluginUninstallAsync(ref@ metaPlugin)
 {
 	auto plugin = cast<Meta::Plugin@>(metaPlugin);
 	string pluginSourcePath = plugin.SourcePath;
+	string pluginIdentifier = plugin.ID;
 
 	warn("Uninstalling plugin " + plugin.Name);
 
@@ -12,11 +13,14 @@ void PluginUninstallAsync(ref@ metaPlugin)
 	yield();
 
 	IO::Delete(pluginSourcePath);
+
+	// Sync the plugin cache
+	PluginCache::SyncRemove(pluginIdentifier);
 }
 
-void PluginInstallAsync(int siteID, const string &in filename, bool load = true)
+void PluginInstallAsync(int siteID, const string &in identifier, bool load = true)
 {
-	warn("Installing plugin with site ID " + siteID + " and filename \"" + filename + "\"");
+	warn("Installing plugin with site ID " + siteID + " and identifier \"" + identifier + "\"");
 
 	// Start downloading the plugin
 	auto req = Net::HttpRequest();
@@ -30,12 +34,17 @@ void PluginInstallAsync(int siteID, const string &in filename, bool load = true)
 	}
 
 	// Save the file
-	string savePath = IO::FromDataFolder("Plugins/" + filename);
+	string savePath = IO::FromDataFolder("Plugins/" + identifier + ".op");
 	req.SaveToFile(savePath);
 
 	if (load) {
 		// Load the plugin
-		Meta::LoadPlugin(savePath, Meta::PluginSource::UserFolder, Meta::PluginType::Zip);
+		auto plugin = Meta::LoadPlugin(savePath, Meta::PluginSource::UserFolder, Meta::PluginType::Zip);
+
+		// Sync the plugin cache
+		if (plugin !is null) {
+			PluginCache::Sync(plugin);
+		}
 	}
 }
 
@@ -49,25 +58,34 @@ void PluginUpdateAsync(ref@ update)
 		return;
 	}
 
+	// If the plugin is currently loaded
 	auto installedPlugin = Meta::GetPluginFromSiteID(au.m_siteID);
+	if (installedPlugin !is null) {
+		// Gather dependency index
+		auto index = Meta::PluginIndex();
+		index.AddTree(installedPlugin);
+		index.DependencySort();
 
-	// Gather dependency index
-	auto index = Meta::PluginIndex();
-	index.AddTree(installedPlugin);
-	index.DependencySort();
+		// Uninstall the plugin (this will also unload dependents)
+		PluginUninstallAsync(installedPlugin);
+		@installedPlugin = null;
 
-	// Uninstall the plugin (this will also unload dependents)
-	PluginUninstallAsync(installedPlugin);
-	@installedPlugin = null;
+		// Install the plugin without loading it
+		PluginInstallAsync(au.m_siteID, au.m_identifier, false);
 
-	// Install the plugin without loading it
-	PluginInstallAsync(au.m_siteID, au.m_filename, false);
+		// Load all plugins in the sorted index
+		int count = index.GetCount();
+		for (int i = 0; i < count; i++) {
+			auto item = index.GetItem(i);
+			Meta::LoadPlugin(item.Path, item.Source, item.Type);
+		}
 
-	// Load all plugins in the sorted index
-	int count = index.GetCount();
-	for (int i = 0; i < count; i++) {
-		auto item = index.GetItem(i);
-		Meta::LoadPlugin(item.Path, item.Source, item.Type);
+	} else {
+		// The plugin is not currently loaded, so we only have to delete the file to uninstall it
+		IO::Delete(IO::FromDataFolder("Plugins/" + au.m_identifier + ".op"));
+
+		// Install and load the plugin
+		PluginInstallAsync(au.m_siteID, au.m_identifier);
 	}
 
 	// Unmark this available update
@@ -88,7 +106,7 @@ void UpdateAllPluginsAsync()
 	for (uint i = 0; i < g_availableUpdates.Length; i++) {
 		auto au = g_availableUpdates[i];
 		PluginUninstallAsync(Meta::GetPluginFromSiteID(au.m_siteID));
-		PluginInstallAsync(au.m_siteID, au.m_filename, false);
+		PluginInstallAsync(au.m_siteID, au.m_identifier, false);
 	}
 
 	// Load all plugins in the sorted index

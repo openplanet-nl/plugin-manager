@@ -2,9 +2,9 @@ class AvailableUpdate
 {
 	string m_name;
 	int m_siteID;
+	string m_identifier;
 	string m_oldVersion;
 	string m_newVersion;
-	string m_filename;
 }
 
 array<AvailableUpdate@> g_availableUpdates;
@@ -35,13 +35,17 @@ void CheckForUpdatesAsync()
 	// Clear list of available updates
 	g_availableUpdates.RemoveRange(0, g_availableUpdates.Length);
 
-	// Make a list of plugin site ID's to check
+	// Make a list of plugin site ID's from the plugin cache to check
 	string ids = "";
-	auto plugins = Meta::AllPlugins();
-	for (uint i = 0; i < plugins.Length; i++) {
-		auto plugin = plugins[i];
-		if (plugin.SiteID > 0) {
-			ids += plugin.SiteID + ",";
+	auto arrPluginKeys = PluginCache::g_infos.GetKeys();
+	for (uint i = 0; i < arrPluginKeys.Length; i++) {
+		string identifier = arrPluginKeys[i];
+		auto info = cast<PluginCache::Info>(PluginCache::g_infos[identifier]);
+
+		if (info.m_siteID > 0) {
+			ids += info.m_siteID + ",";
+		} else {
+			ids += identifier + ",";
 		}
 	}
 
@@ -69,29 +73,30 @@ void CheckForUpdatesAsync()
 		string siteVersion = jsVersion["version"];
 		string siteIdentifier = jsVersion["identifier"];
 
-		auto plugin = Meta::GetPluginFromSiteID(siteId);
-		if (plugin is null) {
+		PluginCache::Info@ info;
+		if (!PluginCache::g_infos.Get(siteIdentifier, @info)) {
+			error("Unable to find plugin with identifier \"" + siteIdentifier + "\" in plugin cache! This is a bug, please report!");
 			continue;
 		}
 
-		if (Version(siteVersion) <= Version(plugin.Version)) {
+		if (Version(siteVersion) <= info.m_version) {
 			continue;
 		}
 
-		warn("New plugin update available for " + plugin.Name + ": " + plugin.Version + " -> " + siteVersion);
+		warn("New plugin update available for " + info.m_name + ": " + info.m_version.ToString() + " -> " + siteVersion);
 
 		UI::ShowNotification(
 			"\\$ff7" + Icons::ArrowCircleUp + "\\$z Plugin update available",
-			"Version \\$ff7" + siteVersion + "\\$z is available for \\$ff7" + plugin.Name + "\\$z. You can install it through the plugin manager.",
+			"Version \\$ff7" + siteVersion + "\\$z is available for \\$ff7" + info.m_name + "\\$z. You can install it through the plugin manager.",
 			vec4(0.27f, 0.27f, 0, 1)
 		);
 
 		auto au = AvailableUpdate();
-		au.m_name = plugin.Name;
+		au.m_name = info.m_name;
 		au.m_siteID = siteId;
-		au.m_oldVersion = plugin.Version;
+		au.m_identifier = siteIdentifier;
+		au.m_oldVersion = info.m_version.ToString();
 		au.m_newVersion = siteVersion;
-		au.m_filename = siteIdentifier + ".op";
 		g_availableUpdates.InsertLast(au);
 	}
 
@@ -102,8 +107,13 @@ void CheckForUpdatesAsync()
 
 void CheckForUpdatesAsyncStartUp()
 {
+	// Synchronize plugin cache on startup
+	PluginCache::Sync();
+
+	// Perform the actual update check
 	CheckForUpdatesAsync();
 
+	// Automatically update plugins if we have that enabled in the settings
 	if (g_availableUpdates.Length > 0 && Setting_PerformAutoUpdates) {
 		for (uint i = 0; i < g_availableUpdates.Length; i++) {
 			auto au = g_availableUpdates[i];

@@ -14,6 +14,10 @@ void RenderMenuMain()
 		}
 
 		if (UI::MenuItem(Icons::Refresh + " Check for updates")) {
+			// When manually checking for updates, we synchronize the cache as well
+			PluginCache::Sync();
+
+			// Start checking for updates
 			startnew(CheckForUpdatesAsync);
 		}
 
