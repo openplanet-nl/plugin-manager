@@ -67,7 +67,7 @@ void CheckForUpdatesAsync()
 
 		int siteId = jsVersion["id"];
 		string siteVersion = jsVersion["version"];
-		string siteFilename = jsVersion["filename"];
+		string siteIdentifier = jsVersion["identifier"];
 
 		auto plugin = Meta::GetPluginFromSiteID(siteId);
 		if (plugin is null) {
@@ -91,7 +91,7 @@ void CheckForUpdatesAsync()
 		au.m_siteID = siteId;
 		au.m_oldVersion = plugin.Version;
 		au.m_newVersion = siteVersion;
-		au.m_filename = siteFilename;
+		au.m_filename = siteIdentifier + ".op";
 		g_availableUpdates.InsertLast(au);
 	}
 
