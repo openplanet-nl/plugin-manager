@@ -18,7 +18,7 @@ void PluginUninstallAsync(ref@ metaPlugin)
 	PluginCache::SyncRemove(pluginIdentifier);
 }
 
-void PluginInstallAsync(int siteID, const string &in identifier, bool load = true)
+void PluginInstallAsync(int siteID, const string &in identifier, const Version &in version, bool load = true)
 {
 	warn("Installing plugin with site ID " + siteID + " and identifier \"" + identifier + "\"");
 
@@ -44,6 +44,8 @@ void PluginInstallAsync(int siteID, const string &in identifier, bool load = tru
 		// Sync the plugin cache
 		if (plugin !is null) {
 			PluginCache::Sync(plugin);
+		} else {
+			PluginCache::SyncUnloaded(identifier, siteID, version);
 		}
 	}
 }
@@ -71,7 +73,7 @@ void PluginUpdateAsync(ref@ update)
 		@installedPlugin = null;
 
 		// Install the plugin without loading it
-		PluginInstallAsync(au.m_siteID, au.m_identifier, false);
+		PluginInstallAsync(au.m_siteID, au.m_identifier, Version(au.m_newVersion), false);
 
 		// Load all plugins in the sorted index
 		int count = index.GetCount();
@@ -85,7 +87,7 @@ void PluginUpdateAsync(ref@ update)
 		IO::Delete(IO::FromDataFolder("Plugins/" + au.m_identifier + ".op"));
 
 		// Install and load the plugin
-		PluginInstallAsync(au.m_siteID, au.m_identifier);
+		PluginInstallAsync(au.m_siteID, au.m_identifier, Version(au.m_newVersion));
 	}
 
 	// Unmark this available update
@@ -115,14 +117,14 @@ void UpdateAllPluginsAsync()
 			@installedPlugin = null;
 
 			// Install the plugin without loading it
-			PluginInstallAsync(au.m_siteID, au.m_identifier, false);
+			PluginInstallAsync(au.m_siteID, au.m_identifier, Version(au.m_newVersion), false);
 
 		} else {
 			// The plugin is not currently loaded, so we only have to delete the file to uninstall it
 			IO::Delete(IO::FromDataFolder("Plugins/" + au.m_identifier + ".op"));
 
 			// Install and load the plugin
-			PluginInstallAsync(au.m_siteID, au.m_identifier);
+			PluginInstallAsync(au.m_siteID, au.m_identifier, Version(au.m_newVersion));
 		}
 	}
 

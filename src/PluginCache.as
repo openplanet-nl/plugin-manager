@@ -142,7 +142,26 @@ namespace PluginCache
 		info.m_version = Version(plugin.Version);
 
 		if (Setting_VerboseLog) {
-			trace("Plugin cache: Synchronized " + plugin.ID);
+			trace("Plugin cache: Synchronized " + plugin.ID + " " + plugin.Version);
+		}
+
+		// Mark the cache as dirty
+		g_dirty = true;
+	}
+
+	void SyncUnloaded(const string &in identifier, int siteID, const Version &in version)
+	{
+		Info@ info;
+		if (!g_infos.Get(identifier, @info)) {
+			@info = Info();
+			g_infos.Set(identifier, @info);
+		}
+		info.m_name = identifier;
+		info.m_siteID = siteID;
+		info.m_version = version;
+
+		if (Setting_VerboseLog) {
+			trace("Plugin cache: Synchronized unloaded " + identifier + " " + version.ToString());
 		}
 
 		// Mark the cache as dirty

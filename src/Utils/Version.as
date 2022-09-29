@@ -2,9 +2,7 @@ class Version
 {
 	array<int> m_versions;
 
-	Version()
-	{
-	}
+	Version() {}
 
 	Version(const string &in str)
 	{
@@ -19,7 +17,7 @@ class Version
 		m_versions = other.m_versions;
 	}
 
-	string ToString()
+	string ToString() const
 	{
 		string ret;
 		for (uint i = 0; i < m_versions.Length; i++) {
@@ -31,7 +29,7 @@ class Version
 		return ret;
 	}
 
-	int opCmp(const Version &in other)
+	int opCmp(const Version &in other) const
 	{
 		uint num = m_versions.Length;
 		if (other.m_versions.Length > num) {
