@@ -13,5 +13,5 @@ string Setting_BaseURL = "https://openplanet.dev/";
 [Setting category="Advanced" name="Verbose API log"]
 bool Setting_VerboseLog = false;
 
-[Setting category="Advanced" name="Auto-update plugins (only at game start)"]
+[Setting category="Advanced" name="Auto-update plugins on game startup"]
 bool Setting_PerformAutoUpdates = false;
