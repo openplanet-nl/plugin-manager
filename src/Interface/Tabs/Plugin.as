@@ -127,21 +127,21 @@ class PluginTab : Tab
 
 			// If the plugin is loaded we can uninstall normally
 			PluginUninstallAsync(installedPlugin);
-
-			// Remove from list of available updates, if it exists
-			for (uint i = 0; i < g_availableUpdates.Length; i++) {
-				auto au = g_availableUpdates[i];
-				if (au.m_siteID == pluginSiteID) {
-					RemoveAvailableUpdate(au);
-					break;
-				}
-			}
 		} else {
 			// If the plugin is not loaded (but it is installed) we can just delete the file
 			// This can happen when a plugin is unsigned or there's some other permission-related error
 			string path = IO::FromDataFolder("Plugins/" + m_plugin.m_id + ".op");
 			if (IO::FileExists(path)) {
 				IO::Delete(path);
+			}
+		}
+
+		// Remove from list of available updates, if it exists
+		for (uint i = 0; i < g_availableUpdates.Length; i++) {
+			auto au = g_availableUpdates[i];
+			if (au.m_identifier == m_plugin.m_id) {
+				RemoveAvailableUpdate(au);
+				break;
 			}
 		}
 
