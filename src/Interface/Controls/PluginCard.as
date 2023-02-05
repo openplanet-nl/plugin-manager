@@ -21,14 +21,18 @@ namespace Controls
 		}
 
 		// Draw an installed tag on top of the image if it's installed
+		uint tagRow = 0;
+		vec2 tagPos;
 		if (plugin.GetInstalledPlugin() !is null) {
-			vec2 tagPos = windowPos + imagePos + vec2(6, 6);
+			tagPos = windowPos + imagePos + vec2(6, 6 + (30*tagRow));
 			DrawTag(tagPos, Icons::CheckCircle + " Installed", Controls::TAG_COLOR_PRIMARY);
+			tagRow++;
 
 			// Draw an updatable tag on top of the image if it's installed and updatable
 			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
-				tagPos = windowPos + imagePos + vec2(6, 36);
+				tagPos = windowPos + imagePos + vec2(6, 6 + (30*tagRow));
 				DrawTag(tagPos, Icons::ArrowCircleUp + " Update!", Controls::TAG_COLOR_WARNING);
+				tagRow++;
 
 				// if updatable, show changelog in tooltip
 				if(Setting_ChangelogTooltips && UI::IsItemHovered()) {
@@ -37,6 +41,28 @@ namespace Controls
 					PluginChangelog(plugin, true);
 					UI::EndTooltip();
 				}
+			}
+		}
+
+		// draw alert if unsigned
+		if (!plugin.m_signed) {
+			tagPos = windowPos + imagePos + vec2(6, 6 + (30*tagRow));
+			string text = Icons::Code + " Unsigned";
+			DrawTag(tagPos, text, Controls::TAG_COLOR_DARK);
+			tagRow++;
+
+			// hacky invisible button to tooltip only on tag and not entire PluginCard
+			vec2 cursor = UI::GetCursorPos();
+			UI::SetCursorPos(tagPos - windowPos);
+			vec2 textSize = Draw::MeasureString(text);
+			vec2 tagSize = textSize + Controls::TAG_PADDING * 2;
+			UI::InvisibleButton(plugin.m_id + "_unsigned", tagSize);
+			UI::SetCursorPos(cursor);
+
+			if (UI::IsItemHovered()) {
+				UI::BeginTooltip();
+				UI::Text("This plugin is unsigned and requires developer mode.");
+				UI::EndTooltip();
 			}
 		}
 
