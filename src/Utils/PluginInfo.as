@@ -62,6 +62,8 @@ class PluginInfo
 
 	bool m_isInstalled;
 
+	Net::HttpRequest@ m_changelogRequest;
+
 	PluginInfo(const Json::Value &in js)
 	{
 		m_siteID = js["id"];
@@ -141,21 +143,28 @@ class PluginInfo
 		}
 	}
 
-	bool LoadChangelog() {
-		Net::HttpRequest@ req = API::Get("plugin/" + m_siteID + "/versions");
-		Json::Value js = Json::Parse(req.String());
+	void LoadChangelog() {
+		@m_changelogRequest = API::Get("plugin/" + m_siteID + "/versions");
+	}
+
+	void CheckChangelog() {
+		if (!m_changelogRequest.Finished()) {
+			return;
+		}
+
+		Json::Value js = Json::Parse(m_changelogRequest.String());
 		if (js.GetType() == Json::Type::Object) {
 			error("Unable to fetch changelog for " + m_name + ": \"" + string(js["error"]) + "\"");
-			return false;
+			return;
 		} else if (js.GetType() != Json::Type::Array) {
 			error("Unable to check for updates, unexpected response from server!");
-			return false;
+			return;
 		}
 
 		for (uint i = 0; i < js.Length; i++) {
 			m_changelogs.InsertLast(Changelog(js[i]));
 		}
-		return true;
+		return;
 	}
 
 	Version GetInstalledVersion() {

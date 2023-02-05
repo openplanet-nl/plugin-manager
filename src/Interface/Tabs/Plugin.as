@@ -64,18 +64,19 @@ class PluginTab : Tab
 	void CheckRequestChangelog()
 	{
 		// If there's a request, check if it has finished
-		if (m_requestMain !is null && m_requestMain.Finished() && m_plugin !is null) {
+		if (m_requestChangelog !is null && m_requestChangelog.Finished() && m_plugin !is null) {
 			// Parse the response
-			string res = m_requestMain.String();
-			int resCode = m_requestMain.ResponseCode();
-			@m_requestMain = null;
+			string res = m_requestChangelog.String();
+			int resCode = m_requestChangelog.ResponseCode();
+			@m_requestChangelog = null;
 			auto js = Json::Parse(res);
 
 			// Handle the response
-			if (js.GetType() != Json::Type::Object) {
-				HandleErrorResponse(res, resCode);
-			} else if (js.HasKey("error")) {
-				HandleErrorResponse(js["error"], resCode);
+			if (js.GetType() != Json::Type::Array) {
+				m_changelogFillerMessage = "Error fetching changelog. :(";
+			} else if (js.GetType() == Json::Type::Object && js.HasKey("error")) {
+				m_changelogFillerMessage = "Error fetching changelog. :(";
+				warn(js["error"]);
 			} else {
 				for (uint i = 0; i < js.Length; i++) {
 					m_plugin.m_changelogs.InsertLast(Changelog(js[i]));
@@ -87,9 +88,6 @@ class PluginTab : Tab
 	void HandleResponse(const Json::Value &in js)
 	{
 		@m_plugin = PluginInfo(js);
-		if (!m_plugin.LoadChangelog()) {
-			m_changelogFillerMessage = "Error fetching changelog. :(";
-		}
 	}
 
 	void HandleErrorResponse(const string &in message, int code)
