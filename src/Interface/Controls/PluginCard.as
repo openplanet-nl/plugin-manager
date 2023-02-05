@@ -31,15 +31,26 @@ namespace Controls
 			// Draw an updatable tag on top of the image if it's installed and updatable
 			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
 				tagPos = windowPos + imagePos + vec2(6, 6 + (30*tagRow));
-				DrawTag(tagPos, Icons::ArrowCircleUp + " Update!", Controls::TAG_COLOR_WARNING);
+				string text = Icons::ArrowCircleUp + " Update!";
+				DrawTag(tagPos, text, Controls::TAG_COLOR_WARNING);
 				tagRow++;
 
 				// if updatable, show changelog in tooltip
-				if(Setting_ChangelogTooltips && UI::IsItemHovered()) {
-					UI::BeginTooltip();
-					UI::Dummy(vec2(512,1)); // SetNextItemWidth wasnt working :(
-					PluginChangelog(plugin, true);
-					UI::EndTooltip();
+				if(Setting_ChangelogTooltips) {
+					// hacky invisible button to tooltip only on tag and not entire PluginCard
+					vec2 cursor = UI::GetCursorPos();
+					UI::SetCursorPos(tagPos - windowPos);
+					vec2 textSize = Draw::MeasureString(text);
+					vec2 tagSize = textSize + Controls::TAG_PADDING * 2;
+					UI::InvisibleButton(plugin.m_id + "_updatable", tagSize);
+					UI::SetCursorPos(cursor);
+
+					if (UI::IsItemHovered()) {					
+						UI::BeginTooltip();
+						UI::Dummy(vec2(512,1)); // SetNextItemWidth wasnt working :(
+						PluginChangelog(plugin, true);
+						UI::EndTooltip();
+					}
 				}
 			}
 		}
