@@ -47,7 +47,7 @@ namespace Controls
 
 					if (UI::IsItemHovered()) {					
 						UI::BeginTooltip();
-						UI::Dummy(vec2(512,1)); // SetNextItemWidth wasnt working :(
+						UI::Dummy(vec2(512,0)); // SetNextItemWidth wasnt working :(
 						PluginChangelog(plugin, true);
 						UI::EndTooltip();
 					}
