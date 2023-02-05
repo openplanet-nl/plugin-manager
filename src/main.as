@@ -1,9 +1,11 @@
 UI::Font@ g_fontHeader;
+UI::Font@ g_fontSubHeader;
 
 void Main()
 {
 	// Load header font
 	@g_fontHeader = UI::LoadFont("DroidSans.ttf", 26);
+	@g_fontSubHeader = UI::LoadFont("DroidSans.ttf", 20);
 
 	// Load plugin cache
 	PluginCache::Initialize();

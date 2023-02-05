@@ -14,6 +14,24 @@ class TagInfo
 	}
 }
 
+class Changelog
+{
+	int m_siteID;
+	int64 m_postTime;
+	Version m_version;
+    bool m_isSigned;
+    string m_changeMessage;
+
+	Changelog(const Json::Value &in js)
+	{
+		m_siteID = js["id"];
+		m_postTime = js["posttime"];
+		m_version = Version(js["version"]);
+		m_isSigned = js["signed"];
+		m_changeMessage = js["changes"];
+	}
+}
+
 class PluginInfo
 {
 	int m_siteID;
@@ -40,6 +58,8 @@ class PluginInfo
 	array<string> m_screenshots;
 
 	array<TagInfo@> m_tags;
+
+	array<Changelog@> m_changelog;
 
 	bool m_isInstalled;
 
@@ -120,5 +140,30 @@ class PluginInfo
 			m_isInstalled = true;
 			return;
 		}
+	}
+
+	bool LoadChangelog() {
+		Net::HttpRequest@ req = API::Get("plugin/" + m_siteID + "/versions");
+		Json::Value js = Json::Parse(req.String());
+		if (js.GetType() == Json::Type::Object) {
+			error("Unable to fetch changelog for " + m_name + ": \"" + string(js["error"]) + "\"");
+			return false;
+		} else if (js.GetType() != Json::Type::Array) {
+			error("Unable to check for updates, unexpected response from server!");
+			return false;
+		}
+
+		for (uint i = 0; i < js.Length; i++) {
+			Changelog cl(js[i]);
+			m_changelog.InsertLast(cl);
+		}
+		return true;
+	}
+
+	Version getInstalledVersion() {
+		if (!m_isInstalled) {
+			return Version("0.0.0");
+		}
+		return Version(Meta::GetPluginFromSiteID(m_siteID).Version);
 	}
 }

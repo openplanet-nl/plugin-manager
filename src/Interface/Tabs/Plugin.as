@@ -1,9 +1,11 @@
 class PluginTab : Tab
 {
-	Net::HttpRequest@ m_request;
+	Net::HttpRequest@ m_requestMain;
+	Net::HttpRequest@ m_requestChangelog;
 
 	bool m_error = false;
 	string m_errorMessage;
+	string m_changelogFillerMessage = "Loading changelog...";
 
 	int m_siteID;
 	PluginInfo@ m_plugin;
@@ -13,7 +15,7 @@ class PluginTab : Tab
 	PluginTab(int siteID)
 	{
 		m_siteID = siteID;
-		StartRequest(m_siteID);
+		StartRequests(m_siteID);
 	}
 
 	bool CanClose() override { return !m_updating; }
@@ -29,22 +31,22 @@ class PluginTab : Tab
 		return ret + "###Plugin " + m_siteID;
 	}
 
-	void StartRequest(int siteID)
+	void StartRequests(int siteID)
 	{
 		m_error = false;
 		m_errorMessage = "";
 
-		@m_request = API::Get("plugin/" + siteID);
+		@m_requestMain = API::Get("plugin/" + siteID);
 	}
 
 	void CheckRequest()
 	{
 		// If there's a request, check if it has finished
-		if (m_request !is null && m_request.Finished()) {
+		if (m_requestMain !is null && m_requestMain.Finished()) {
 			// Parse the response
-			string res = m_request.String();
-			int resCode = m_request.ResponseCode();
-			@m_request = null;
+			string res = m_requestMain.String();
+			int resCode = m_requestMain.ResponseCode();
+			@m_requestMain = null;
 			auto js = Json::Parse(res);
 
 			// Handle the response
@@ -61,6 +63,9 @@ class PluginTab : Tab
 	void HandleResponse(const Json::Value &in js)
 	{
 		@m_plugin = PluginInfo(js);
+		if (!m_plugin.LoadChangelog()) {
+			m_changelogFillerMessage = "Error fetching changelog. :(";
+		}
 	}
 
 	void HandleErrorResponse(const string &in message, int code)
@@ -189,7 +194,7 @@ class PluginTab : Tab
 	{
 		CheckRequest();
 
-		if (m_request !is null) {
+		if (m_requestMain !is null) {
 			UI::Text("Loading plugin..");
 			return;
 		}
@@ -286,6 +291,44 @@ class PluginTab : Tab
 		UI::Separator();
 
 		UI::Markdown(m_plugin.m_description);
+
+		UI::Separator();
+
+		UI::Dummy(vec2(1, UI::GetTextLineHeightWithSpacing()));
+		UI::PushFont(g_fontSubHeader);
+		UI::Text("Versions");
+		UI::PopFont();
+
+		if (m_plugin.m_changelog.Length == 0) {
+			UI::Text(m_changelogFillerMessage);
+		} else {
+			for (uint i = 0; i < m_plugin.m_changelog.Length; i++) {
+				UI::Separator();
+				Changelog@ v = m_plugin.m_changelog[i];
+				UI::PushFont(g_fontSubHeader);
+				string title;
+				Version installedVersion = m_plugin.getInstalledVersion();
+				if (v.m_postTime > Time::Stamp - 86400) {
+					title = v.m_version.ToString() + " - " + Time::FormatString("%X", v.m_postTime); // use time for plugins released today
+				} else {
+					title = v.m_version.ToString() + " - " + Time::FormatString("%x", v.m_postTime); // otherwise use date
+				}
+				
+				if (m_plugin.m_isInstalled && installedVersion == v.m_version) {
+					UI::Text(title + " (installed)");
+				} else {
+					UI::Text(title);
+				}
+				UI::PopFont();
+
+				if (v.m_changeMessage.Length == 0 && i == (m_plugin.m_changelog.Length-1)) {
+					UI::Markdown("*Initial release*");
+				} else {
+					UI::Markdown(v.m_changeMessage);
+				}
+			}
+		}
+
 		UI::EndChild();
 	}
 }
