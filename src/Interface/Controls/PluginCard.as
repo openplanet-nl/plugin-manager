@@ -26,7 +26,7 @@ namespace Controls
 			DrawTag(tagPos, Icons::CheckCircle + " Installed", Controls::TAG_COLOR_PRIMARY);
 
 			// Draw an updatable tag on top of the image if it's installed and updatable
-			if (true) {
+			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
 				tagPos = windowPos + imagePos + vec2(6, 36);
 				DrawTag(tagPos, Icons::ArrowCircleUp + " Update!", Controls::TAG_COLOR_WARNING);
 
