@@ -58,8 +58,7 @@ class PluginInfo
 	array<string> m_screenshots;
 
 	array<TagInfo@> m_tags;
-
-	array<Changelog@> m_changelog;
+	array<Changelog@> m_changelogs;
 
 	bool m_isInstalled;
 
@@ -154,13 +153,12 @@ class PluginInfo
 		}
 
 		for (uint i = 0; i < js.Length; i++) {
-			Changelog cl(js[i]);
-			m_changelog.InsertLast(cl);
+			m_changelogs.InsertLast(Changelog(js[i]));
 		}
 		return true;
 	}
 
-	Version getInstalledVersion() {
+	Version GetInstalledVersion() {
 		if (!m_isInstalled) {
 			return Version("0.0.0");
 		}

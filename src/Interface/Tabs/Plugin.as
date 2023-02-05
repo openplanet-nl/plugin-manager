@@ -300,7 +300,7 @@ class PluginTab : Tab
 		UI::PopFont();
 
 		UI::Separator();
-		if (m_plugin.m_changelog.Length == 0) {
+		if (m_plugin.m_changelogs.Length == 0) {
 			UI::Text(m_changelogFillerMessage);
 		} else {
 			Controls::PluginChangelog(m_plugin, false);
