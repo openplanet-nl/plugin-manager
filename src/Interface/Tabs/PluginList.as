@@ -117,7 +117,7 @@ class PluginListTab : Tab
 		auto jsItems = js["items"];
 		for (uint i = 0; i < jsItems.Length; i++) {
 			PluginInfo pi(jsItems[i]);
-			if (pi.getInstalledVersion() < pi.m_version) {
+			if (Setting_ChangelogTooltips && pi.getInstalledVersion() < pi.m_version) {
 				pi.LoadChangelog();
 			}
 			m_plugins.InsertLast(pi);

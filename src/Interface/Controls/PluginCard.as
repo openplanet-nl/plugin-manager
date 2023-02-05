@@ -31,7 +31,7 @@ namespace Controls
 				DrawTag(tagPos, Icons::ArrowCircleUp + " Update!", Controls::TAG_COLOR_WARNING);
 
 				// if updatable, show changelog in tooltip
-				if(UI::IsItemHovered()) {
+				if(Setting_ChangelogTooltips && UI::IsItemHovered()) {
 					UI::BeginTooltip();
 					UI::Dummy(vec2(512,1)); // SetNextItemWidth wasnt working :(
 					PluginChangelog(plugin, true);
