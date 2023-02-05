@@ -328,6 +328,8 @@ class PluginTab : Tab
 						UI::Text("This release is unsigned and requires developer mode.");
 						UI::EndTooltip();
 					}
+				} else {
+					UI::PopFont();
 				}
 
 				if (v.m_changeMessage.Length == 0 && i == (m_plugin.m_changelog.Length-1)) {
