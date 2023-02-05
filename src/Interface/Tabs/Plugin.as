@@ -15,7 +15,7 @@ class PluginTab : Tab
 	PluginTab(int siteID)
 	{
 		m_siteID = siteID;
-		StartRequests(m_siteID);
+		StartRequest(m_siteID);
 	}
 
 	bool CanClose() override { return !m_updating; }
@@ -31,15 +31,16 @@ class PluginTab : Tab
 		return ret + "###Plugin " + m_siteID;
 	}
 
-	void StartRequests(int siteID)
+	void StartRequest(int siteID)
 	{
 		m_error = false;
 		m_errorMessage = "";
 
 		@m_requestMain = API::Get("plugin/" + siteID);
+		@m_requestChangelog = API::Get("plugin/" + siteID + "/versions");
 	}
 
-	void CheckRequest()
+	void CheckRequestMain()
 	{
 		// If there's a request, check if it has finished
 		if (m_requestMain !is null && m_requestMain.Finished()) {
@@ -56,6 +57,29 @@ class PluginTab : Tab
 				HandleErrorResponse(js["error"], resCode);
 			} else {
 				HandleResponse(js);
+			}
+		}
+	}
+
+	void CheckRequestChangelog()
+	{
+		// If there's a request, check if it has finished
+		if (m_requestMain !is null && m_requestMain.Finished() && m_plugin !is null) {
+			// Parse the response
+			string res = m_requestMain.String();
+			int resCode = m_requestMain.ResponseCode();
+			@m_requestMain = null;
+			auto js = Json::Parse(res);
+
+			// Handle the response
+			if (js.GetType() != Json::Type::Object) {
+				HandleErrorResponse(res, resCode);
+			} else if (js.HasKey("error")) {
+				HandleErrorResponse(js["error"], resCode);
+			} else {
+				for (uint i = 0; i < js.Length; i++) {
+					m_plugin.m_changelogs.InsertLast(Changelog(js[i]));
+				}
 			}
 		}
 	}
@@ -192,7 +216,8 @@ class PluginTab : Tab
 
 	void Render() override
 	{
-		CheckRequest();
+		CheckRequestMain();
+		CheckRequestChangelog();
 
 		if (m_requestMain !is null) {
 			UI::Text("Loading plugin..");
