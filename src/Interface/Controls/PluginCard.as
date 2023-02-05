@@ -26,9 +26,17 @@ namespace Controls
 			DrawTag(tagPos, Icons::CheckCircle + " Installed", Controls::TAG_COLOR_PRIMARY);
 
 			// Draw an updatable tag on top of the image if it's installed and updatable
-			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
+			if (true) {
 				tagPos = windowPos + imagePos + vec2(6, 36);
 				DrawTag(tagPos, Icons::ArrowCircleUp + " Update!", Controls::TAG_COLOR_WARNING);
+
+				// if updatable, show changelog in tooltip
+				if(UI::IsItemHovered()) {
+					UI::BeginTooltip();
+					UI::Dummy(vec2(512,1)); // SetNextItemWidth wasnt working :(
+					PluginChangelog(plugin, true);
+					UI::EndTooltip();
+				}
 			}
 		}
 

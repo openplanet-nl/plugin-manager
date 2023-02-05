@@ -299,45 +299,11 @@ class PluginTab : Tab
 		UI::Text("Versions");
 		UI::PopFont();
 
+		UI::Separator();
 		if (m_plugin.m_changelog.Length == 0) {
 			UI::Text(m_changelogFillerMessage);
 		} else {
-			for (uint i = 0; i < m_plugin.m_changelog.Length; i++) {
-				UI::Separator();
-				Changelog@ v = m_plugin.m_changelog[i];
-				UI::PushFont(g_fontSubHeader);
-				string title;
-				Version installedVersion = m_plugin.getInstalledVersion();
-				if (v.m_postTime > Time::Stamp - 86400) {
-					title = v.m_version.ToString() + " - " + Time::FormatString("%X", v.m_postTime); // use time for plugins released today
-				} else {
-					title = v.m_version.ToString() + " - " + Time::FormatString("%x", v.m_postTime); // otherwise use date
-				}
-				
-				if (m_plugin.m_isInstalled && installedVersion == v.m_version) {
-					UI::Text(title + " (installed)");
-				} else {
-					UI::Text(title);
-				}
-				if (!v.m_isSigned) {
-					UI::SameLine();
-					UI::TextDisabled(Icons::Code + " Unsigned");
-					UI::PopFont();
-					if (UI::IsItemHovered()) {
-						UI::BeginTooltip();
-						UI::Text("This release is unsigned and requires developer mode.");
-						UI::EndTooltip();
-					}
-				} else {
-					UI::PopFont();
-				}
-
-				if (v.m_changeMessage.Length == 0 && i == (m_plugin.m_changelog.Length-1)) {
-					UI::Markdown("*Initial release*");
-				} else {
-					UI::Markdown(v.m_changeMessage);
-				}
-			}
+			Controls::PluginChangelog(m_plugin, false);
 		}
 
 		UI::EndChild();
