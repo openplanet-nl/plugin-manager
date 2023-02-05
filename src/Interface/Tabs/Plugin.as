@@ -319,7 +319,16 @@ class PluginTab : Tab
 				} else {
 					UI::Text(title);
 				}
-				UI::PopFont();
+				if (!v.m_isSigned) {
+					UI::SameLine();
+					UI::TextDisabled(Icons::Code + " Unsigned");
+					UI::PopFont();
+					if (UI::IsItemHovered()) {
+						UI::BeginTooltip();
+						UI::Text("This release is unsigned and requires developer mode.");
+						UI::EndTooltip();
+					}
+				}
 
 				if (v.m_changeMessage.Length == 0 && i == (m_plugin.m_changelog.Length-1)) {
 					UI::Markdown("*Initial release*");
