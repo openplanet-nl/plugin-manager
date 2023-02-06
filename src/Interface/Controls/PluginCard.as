@@ -45,9 +45,9 @@ namespace Controls
 					UI::InvisibleButton(plugin.m_id + "_updatable", tagSize);
 					UI::SetCursorPos(cursor);
 
-					if (UI::IsItemHovered()) {					
+					if (UI::IsItemHovered()) {
+						UI::SetNextWindowSize(400, -1, UI::Cond::Always);
 						UI::BeginTooltip();
-						UI::Dummy(vec2(512,0)); // SetNextItemWidth wasnt working :(
 						PluginChangelog(plugin, true);
 						UI::EndTooltip();
 					}
