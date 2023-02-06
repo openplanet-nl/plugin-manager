@@ -32,19 +32,10 @@ namespace Controls
 			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
 				tagPos = windowPos + imagePos + vec2(6, 6 + (30*tagRow));
 				string text = Icons::ArrowCircleUp + " Update!";
-				DrawTag(tagPos, text, Controls::TAG_COLOR_WARNING);
+				DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_WARNING);
 				tagRow++;
 
-				// if updatable, show changelog in tooltip
 				if(Setting_ChangelogTooltips) {
-					// hacky invisible button to tooltip only on tag and not entire PluginCard
-					vec2 cursor = UI::GetCursorPos();
-					UI::SetCursorPos(tagPos - windowPos);
-					vec2 textSize = Draw::MeasureString(text);
-					vec2 tagSize = textSize + Controls::TAG_PADDING * 2;
-					UI::InvisibleButton(plugin.m_id + "_updatable", tagSize);
-					UI::SetCursorPos(cursor);
-
 					if (UI::IsItemHovered()) {
 						UI::SetNextWindowSize(400, -1, UI::Cond::Always);
 						UI::BeginTooltip();
@@ -59,16 +50,8 @@ namespace Controls
 		if (!plugin.m_signed) {
 			tagPos = windowPos + imagePos + vec2(6, 6 + (30*tagRow));
 			string text = Icons::Code + " Unsigned";
-			DrawTag(tagPos, text, Controls::TAG_COLOR_DARK);
+			DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_DARK);
 			tagRow++;
-
-			// hacky invisible button to tooltip only on tag and not entire PluginCard
-			vec2 cursor = UI::GetCursorPos();
-			UI::SetCursorPos(tagPos - windowPos);
-			vec2 textSize = Draw::MeasureString(text);
-			vec2 tagSize = textSize + Controls::TAG_PADDING * 2;
-			UI::InvisibleButton(plugin.m_id + "_unsigned", tagSize);
-			UI::SetCursorPos(cursor);
 
 			if (UI::IsItemHovered()) {
 				UI::BeginTooltip();

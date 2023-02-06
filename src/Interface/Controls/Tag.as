@@ -26,6 +26,17 @@ namespace Controls
 		return DrawTag(vec4(pos.x, pos.y, tagSize.x, tagSize.y), text, color);
 	}
 
+	vec4 DrawTagWithInvisButton(const vec2 &in pos, const vec2 &in windowPos, const string &in text, const vec4 &in color = TAG_COLOR) {
+		vec4 ret = DrawTag(pos, text, color);
+
+		vec2 cursor = UI::GetCursorPos();
+		UI::SetCursorPos(pos - windowPos);
+		UI::InvisibleButton("", ret.zw);
+		UI::SetCursorPos(cursor);
+
+		return ret;
+	}
+
 	void Tag(const string &in text, const vec4 &in color = TAG_COLOR)
 	{
 		vec2 textSize = Draw::MeasureString(text);
