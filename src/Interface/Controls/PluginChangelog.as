@@ -1,9 +1,9 @@
 namespace Controls
 {
-    void PluginChangelog(PluginInfo@ plugin, bool onlyUpdates = false)
+    void PluginChangelogList(PluginInfo@ plugin, bool onlyUpdates = false)
     {
 		for (uint i = 0; i < plugin.m_changelogs.Length; i++) {
-			Changelog@ v = plugin.m_changelogs[i];
+			PluginChangelog@ v = plugin.m_changelogs[i];
             Version installedVersion = plugin.GetInstalledVersion();
 
             if (onlyUpdates && v.m_version <= installedVersion) {

@@ -79,7 +79,7 @@ class PluginTab : Tab
 				warn(js["error"]);
 			} else {
 				for (uint i = 0; i < js.Length; i++) {
-					m_plugin.m_changelogs.InsertLast(Changelog(js[i]));
+					m_plugin.m_changelogs.InsertLast(PluginChangelog(js[i]));
 				}
 			}
 		}
@@ -326,7 +326,7 @@ class PluginTab : Tab
 		if (m_plugin.m_changelogs.Length == 0) {
 			UI::Text(m_changelogFillerMessage);
 		} else {
-			Controls::PluginChangelog(m_plugin, false);
+			Controls::PluginChangelogList(m_plugin, false);
 		}
 
 		UI::EndChild();

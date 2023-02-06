@@ -1,37 +1,3 @@
-class TagInfo
-{
-	string m_type;
-	string m_name;
-	string m_class;
-	string m_tooltip;
-
-	TagInfo(const Json::Value &in js)
-	{
-		m_type = js["type"];
-		m_name = js["name"];
-		m_class = js["class"];
-		m_tooltip = js["tooltip"];
-	}
-}
-
-class Changelog
-{
-	int m_siteID;
-	int64 m_postTime;
-	Version m_version;
-    bool m_isSigned;
-    string m_changeMessage;
-
-	Changelog(const Json::Value &in js)
-	{
-		m_siteID = js["id"];
-		m_postTime = js["posttime"];
-		m_version = Version(js["version"]);
-		m_isSigned = js["signed"];
-		m_changeMessage = js["changes"];
-	}
-}
-
 class PluginInfo
 {
 	int m_siteID;
@@ -58,7 +24,7 @@ class PluginInfo
 	array<string> m_screenshots;
 
 	array<TagInfo@> m_tags;
-	array<Changelog@> m_changelogs;
+	array<PluginChangelog@> m_changelogs;
 
 	bool m_isInstalled;
 
@@ -162,17 +128,17 @@ class PluginInfo
 		}
 
 		for (uint i = 0; i < js.Length; i++) {
-			m_changelogs.InsertLast(Changelog(js[i]));
+			m_changelogs.InsertLast(PluginChangelog(js[i]));
 		}
 		return;
 	}
 
 	Version GetInstalledVersion()
 	{
-		auto _plugin = Meta::GetPluginFromSiteID(m_siteID);
-		if (!m_isInstalled || _plugin is null) {
+		auto plugin = Meta::GetPluginFromSiteID(m_siteID);
+		if (!m_isInstalled || plugin is null) {
 			return Version("0.0.0");
 		}
-		return Version(_plugin.Version);
+		return Version(plugin.Version);
 	}
 }

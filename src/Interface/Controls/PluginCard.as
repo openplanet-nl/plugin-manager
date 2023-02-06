@@ -39,7 +39,7 @@ namespace Controls
 					if (UI::IsItemHovered()) {
 						UI::SetNextWindowSize(400, -1, UI::Cond::Always);
 						UI::BeginTooltip();
-						PluginChangelog(plugin, true);
+						PluginChangelogList(plugin, true);
 						UI::EndTooltip();
 					}
 				}
