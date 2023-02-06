@@ -167,10 +167,12 @@ class PluginInfo
 		return;
 	}
 
-	Version GetInstalledVersion() {
-		if (!m_isInstalled) {
+	Version GetInstalledVersion()
+	{
+		auto _plugin = Meta::GetPluginFromSiteID(m_siteID);
+		if (!m_isInstalled || _plugin !is null) {
 			return Version("0.0.0");
 		}
-		return Version(Meta::GetPluginFromSiteID(m_siteID).Version);
+		return Version(_plugin.Version);
 	}
 }
