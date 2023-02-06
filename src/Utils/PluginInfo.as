@@ -170,7 +170,7 @@ class PluginInfo
 	Version GetInstalledVersion()
 	{
 		auto _plugin = Meta::GetPluginFromSiteID(m_siteID);
-		if (!m_isInstalled || _plugin !is null) {
+		if (!m_isInstalled || _plugin is null) {
 			return Version("0.0.0");
 		}
 		return Version(_plugin.Version);
