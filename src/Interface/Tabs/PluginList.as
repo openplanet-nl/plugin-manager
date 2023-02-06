@@ -65,7 +65,7 @@ class PluginListTab : Tab
 	void StartRequestForPage(int page)
 	{
 		dictionary params;
-		params['page'] = tostring(page);
+		params["page"] = tostring(page);
 		GetRequestParams(params);
 
 		string urlParams = "";
