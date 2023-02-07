@@ -1,10 +1,9 @@
 class DependencyManagerTab : Tab
 {
-
-	string COLOR_RI = "\\$z";
-	string COLOR_OI = "\\$666";
-	string COLOR_RN = "\\$f00";
-	string COLOR_ON = "\\$f88";
+	string COLOR_RI = Icons::CheckCircle;
+	string COLOR_OI = Icons::CheckCircleO;
+	string COLOR_RN = Icons::Circle;
+	string COLOR_ON = Icons::CircleO;
 
 	string GetLabel() override { return "Dependencies"; }
 
@@ -16,6 +15,12 @@ class DependencyManagerTab : Tab
 
 	void Render() override
 	{
+		if (!Setting_ColorblindDependencies) {
+			COLOR_RI = "\\$z" + COLOR_RI;
+			COLOR_OI = "\\$666" + COLOR_OI;
+			COLOR_RN = "\\$f00" + COLOR_RN;
+			COLOR_ON = "\\$f88" + COLOR_ON;
+		}
 
 		UI::Text(COLOR_RI + "Required dependency  ");
 		UI::SameLine();

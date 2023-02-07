@@ -7,6 +7,9 @@ bool Setting_ColoredUsernames = true;
 [Setting category="Interface" name="Plugins per row" min=1 max=10]
 int Setting_PluginsPerRow = 3;
 
+[Setting category="Interface" name="Disable colored statuses in Dependency view"]
+bool Setting_ColorblindDependencies = false;
+
 [Setting category="Advanced" name="Base URL" description="Only change if you know what you're doing!"]
 string Setting_BaseURL = "https://openplanet.dev/";
 
