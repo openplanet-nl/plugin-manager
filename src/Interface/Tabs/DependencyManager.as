@@ -22,14 +22,20 @@ class DependencyManagerTab : Tab
 			COLOR_ON = "\\$f88" + COLOR_ON;
 		}
 
-		UI::Text(COLOR_RI + "Required dependency  ");
-		UI::SameLine();
-		UI::Text(COLOR_OI + "Optional dependency  ");
-		UI::SameLine();
-		UI::Text(COLOR_RN + "Required dependency (not installed)  ");
-		UI::SameLine();
-		UI::Text(COLOR_ON + "Optional dependency (not installed)  ");
-		UI::Separator();
+		if (UI::BeginTable("legend", 2, UI::TableFlags::SizingStretchSame)) {
+			UI::TableNextRow();
+			UI::TableNextColumn();
+			UI::Text(COLOR_RI + "Required dependency");
+			UI::TableNextColumn();
+			UI::Text(COLOR_OI + "Optional dependency");
+			UI::TableNextRow();
+			UI::TableNextColumn();
+		UI::Text(COLOR_RN + "Required dependency (not installed)");
+			UI::TableNextColumn();
+		UI::Text(COLOR_ON + "Optional dependency (not installed)");
+			UI::EndTable();
+			UI::Separator();
+		}
 
 		Meta::Plugin@[] loaded = Meta::AllPlugins();
 		for (uint i = 0; i < loaded.Length; i++) {
