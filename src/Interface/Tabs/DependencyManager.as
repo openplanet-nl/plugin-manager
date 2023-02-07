@@ -1,6 +1,11 @@
 class DependencyManagerTab : Tab
 {
 
+	string COLOR_RI = "\\$z";
+	string COLOR_OI = "\\$666";
+	string COLOR_RN = "\\$f00";
+	string COLOR_ON = "\\$f88";
+
 	string GetLabel() override { return "Dependencies"; }
 
 	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
@@ -11,6 +16,15 @@ class DependencyManagerTab : Tab
 
 	void Render() override
 	{
+
+		UI::Text(COLOR_RI + "Required dependency  ");
+		UI::SameLine();
+		UI::Text(COLOR_OI + "Optional dependency  ");
+		UI::SameLine();
+		UI::Text(COLOR_RN + "Required dependency (not installed)  ");
+		UI::SameLine();
+		UI::Text(COLOR_ON + "Optional dependency (not installed)  ");
+		UI::Separator();
 
 		Meta::Plugin@[] loaded = Meta::AllPlugins();
 		for (uint i = 0; i < loaded.Length; i++) {
@@ -32,8 +46,9 @@ class DependencyManagerTab : Tab
 			return;
 		}
 
+		string nameColorTag = isOptional ? COLOR_OI : COLOR_RI;
 		int flags = topLevel ? UI::TreeNodeFlags::DefaultOpen : UI::TreeNodeFlags::None;
-		if (UI::TreeNode(_GetPluginTitleString(plugin, isOptional, topLevel), flags)) {
+		if (UI::TreeNode(nameColorTag + GetPluginTitleString(plugin, topLevel), flags)) {
 			if (inChain.Find(plugin.ID) >= 0) {
 				UI::TreeAdvanceToLabelPos();
 				UI::Text("Circular dependency detected...");
@@ -54,20 +69,25 @@ class DependencyManagerTab : Tab
 
 	void _DepLeafNoChilds(Meta::Plugin@ plugin, bool isOptional, bool isTopLevel)
 	{	
+		string nameColorTag = isOptional ? COLOR_OI : COLOR_RI;
 		UI::TreeAdvanceToLabelPos();
-		UI::Text(_GetPluginTitleString(plugin, isOptional, isTopLevel));
+		UI::Text(nameColorTag + GetPluginTitleString(plugin, isTopLevel));
 	}
 
-	string _GetPluginTitleString(Meta::Plugin@ plugin, bool isOptional, bool isTopLevel) {
-		string name = plugin.Name;
-		if (isOptional) {
-			name = "\\$666" + name;
-		}
-		name += " \\$999by " + plugin.Author;
+	string GetPluginTitleString(Meta::Plugin@ plugin, bool isTopLevel) {
+		string name = _GetPluginTitleString(plugin.Name, plugin.Author);
 		if (isTopLevel) {
 			name += " (v" + plugin.Version + " installed)";
 		}
 		return name;
+	}
+
+	string GetPluginTitleString(Json::Value@ plugin) {
+		return _GetPluginTitleString(plugin["name"], plugin["author"]);
+	}
+
+	string _GetPluginTitleString(const string &in pluginName, const string &in author) {
+		return pluginName + " \\$999by " + author;
 	}
 
 	void _DepLeaf(const string &in dep, string[]@ inChain, bool isOptional)
@@ -76,15 +96,13 @@ class DependencyManagerTab : Tab
 		if (child !is null) {
 			DepLeaf(child, inChain, false, isOptional);
 		} else {
-			string name = dep;
-			int siteID = PluginIdentToSiteID(dep);
-			if (isOptional) {
-				name = "\\$666" + name;
-			}
+			int APIcacheRef = PluginIdentToSiteIDRef(dep);
+
+			string nameColorTag = isOptional ? COLOR_ON : COLOR_RN;
 			UI::TreeAdvanceToLabelPos();
-			UI::Text(name + " \\$f00(not installed)\\$z");
-			UI::SameLine();
-			if (siteID == -1) { // could not find in api cache
+			if (APIcacheRef == -1) { // could not find in api cache
+				UI::Text(nameColorTag + dep + "\\$z");
+				UI::SameLine();
 				if (UI::ColoredButton(Icons::ExclamationTriangle, 0.f)) {
 					OpenBrowserURL("https://openplanet.dev/plugin/"+dep);
 				}
@@ -94,17 +112,20 @@ class DependencyManagerTab : Tab
 					UI::EndTooltip();
 				}
 			} else {
-				if (UI::Button(Icons::InfoCircle + "###"+dep, vec2(0, UI::GetTextLineHeight()))) {
-					g_window.AddTab(PluginTab(siteID), true);
+				Json::Value apiRet = g_cachedAPIPluginList[APIcacheRef];
+				UI::Text(nameColorTag + GetPluginTitleString(apiRet) + "\\$z");
+				UI::SameLine();
+				if (UI::Button(Icons::InfoCircle + "###"+dep)) {
+					g_window.AddTab(PluginTab(g_cachedAPIPluginList[APIcacheRef]['id']), true);
 				}
 			}
 		}
 	}
 
-	int PluginIdentToSiteID(const string &in ident) {
+	int PluginIdentToSiteIDRef(const string &in ident) {
 		for (uint i = 0; i < g_cachedAPIPluginList.Length; i++) {
 			if (g_cachedAPIPluginList[i]["identifier"] == ident) {
-				return g_cachedAPIPluginList[i]["id"];
+				return i;
 			}
 		}
 		return -1;
