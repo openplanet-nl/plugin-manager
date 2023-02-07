@@ -28,12 +28,12 @@ class DependencyManagerTab : Tab
 	void DepLeaf(Meta::Plugin@ plugin, string[]@ inChain, bool topLevel, bool isOptional)
 	{
 		if (plugin.Dependencies.Length == 0 && plugin.OptionalDependencies.Length == 0) {
-			_DepLeafNoChilds(plugin, isOptional);
+			_DepLeafNoChilds(plugin, isOptional, topLevel);
 			return;
 		}
 
 		int flags = topLevel ? UI::TreeNodeFlags::DefaultOpen : UI::TreeNodeFlags::None;
-		if (UI::TreeNode(_GetPluginTitleString(plugin, isOptional), flags)) {
+		if (UI::TreeNode(_GetPluginTitleString(plugin, isOptional, topLevel), flags)) {
 			if (inChain.Find(plugin.ID) >= 0) {
 				UI::TreeAdvanceToLabelPos();
 				UI::Text("Circular dependency detected...");
@@ -52,18 +52,21 @@ class DependencyManagerTab : Tab
 		}
 	}
 
-	void _DepLeafNoChilds(Meta::Plugin@ plugin, bool isOptional)
+	void _DepLeafNoChilds(Meta::Plugin@ plugin, bool isOptional, bool isTopLevel)
 	{	
 		UI::TreeAdvanceToLabelPos();
-		UI::Text(_GetPluginTitleString(plugin, isOptional));
+		UI::Text(_GetPluginTitleString(plugin, isOptional, isTopLevel));
 	}
 
-	string _GetPluginTitleString(Meta::Plugin@ plugin, bool isOptional) {
+	string _GetPluginTitleString(Meta::Plugin@ plugin, bool isOptional, bool isTopLevel) {
 		string name = plugin.Name;
 		if (isOptional) {
 			name = "\\$666" + name;
 		}
-		name += " by " + plugin.Author + " (v" + plugin.Version + ")";
+		name += " \\$999by " + plugin.Author;
+		if (isTopLevel) {
+			name += " (v" + plugin.Version + " installed)";
+		}
 		return name;
 	}
 
@@ -74,14 +77,26 @@ class DependencyManagerTab : Tab
 			DepLeaf(child, inChain, false, isOptional);
 		} else {
 			string name = dep;
+			int siteID = PluginIdentToSiteID(dep);
 			if (isOptional) {
 				name = "\\$666" + name;
 			}
 			UI::TreeAdvanceToLabelPos();
 			UI::Text(name + " \\$f00(not installed)\\$z");
 			UI::SameLine();
-			if (UI::Button("Info###"+dep, vec2(0, UI::GetTextLineHeight()))) {
-				g_window.AddTab(PluginTab(PluginIdentToSiteID(dep)), true);
+			if (siteID == -1) { // could not find in api cache
+				if (UI::ColoredButton(Icons::ExclamationTriangle, 0.f)) {
+					OpenBrowserURL("https://openplanet.dev/plugin/"+dep);
+				}
+				if (UI::IsItemHovered()) {
+					UI::BeginTooltip();
+					UI::Text("Plugin identifier not found. Click to search on Openplanet.dev.");
+					UI::EndTooltip();
+				}
+			} else {
+				if (UI::Button(Icons::InfoCircle + "###"+dep, vec2(0, UI::GetTextLineHeight()))) {
+					g_window.AddTab(PluginTab(siteID), true);
+				}
 			}
 		}
 	}
