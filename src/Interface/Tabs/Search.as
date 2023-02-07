@@ -1,27 +1,9 @@
 class SearchTab : PluginListTab
 {
 	string m_search;
-	bool m_closable = false;
 	uint64 m_typingStart;
 
-	SearchTab() {}
-	SearchTab(const string &in ident)
-	{
-		m_search = ident;
-		m_closable = true;
-		StartRequest();
-	}
-
-	bool CanClose() override { return m_closable; }
-
-	string GetLabel() override
-	{
-		if (m_closable) {
-			return Icons::Search + " " + m_search + "###Search";
-		} else {
-			return Icons::Search + " Search###Search";
-		}
-	}
+	string GetLabel() override { return Icons::Search + " Search###Search"; }
 
 	void GetRequestParams(dictionary@ params) override
 	{

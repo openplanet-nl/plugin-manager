@@ -81,9 +81,17 @@ class DependencyManagerTab : Tab
 			UI::Text(name + " \\$f00(not installed)\\$z");
 			UI::SameLine();
 			if (UI::Button("Info###"+dep, vec2(0, UI::GetTextLineHeight()))) {
-				// todo: is there a better way to do this? search by ident instead of siteID would be gr8
-				g_window.AddTab(SearchTab(dep), true);
+				g_window.AddTab(PluginTab(PluginIdentToSiteID(dep)), true);
 			}
 		}
+	}
+
+	int PluginIdentToSiteID(const string &in ident) {
+		for (uint i = 0; i < g_cachedAPIPluginList.Length; i++) {
+			if (g_cachedAPIPluginList[i]["identifier"] == ident) {
+				return g_cachedAPIPluginList[i]["id"];
+			}
+		}
+		return -1;
 	}
 }

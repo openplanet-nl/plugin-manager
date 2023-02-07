@@ -24,4 +24,26 @@ namespace API
 		}
 		return Json::Parse(req.String());
 	}
+
+	Json::Value@[] GetPluginListAsync() {
+		uint pages = 1;
+
+		Json::Value@[] plugs;
+
+		for (uint i = 0; i < pages; i++) {
+			Json::Value req = GetAsync("plugins?page=" + i);
+
+			if (pages == 1 && req["pages"] != 1) {
+				pages = req["pages"];
+			}
+
+			for (uint ii = 0; ii < req["items"].Length; ii++) {
+				plugs.InsertLast(req["items"][ii]);
+			}
+
+			// nap a bit so we dont wreck the Openplanet API...
+			sleep(500);
+		}
+		return plugs;
+	}
 }
