@@ -13,14 +13,14 @@ void Main()
 	CheckForUpdatesAsyncStartUp();
 
 	// load a list of plugins from the API for later use...
-	g_cachedAPIPluginList = API::GetPluginListAsync();
+	API::GetPluginListAsync();
 
 	// Every 30 minutes, check for updates again
 	while (true) {
 		sleep(30 * 60 * 1000);
 		if (Setting_AutoCheckUpdates) {
 			CheckForUpdatesAsync();
-			g_cachedAPIPluginList = API::GetPluginListAsync();
+			API::GetPluginListAsync();
 		}
 	}
 }
