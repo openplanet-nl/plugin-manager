@@ -1,19 +1,3 @@
-class TagInfo
-{
-	string m_type;
-	string m_name;
-	string m_class;
-	string m_tooltip;
-
-	TagInfo(const Json::Value &in js)
-	{
-		m_type = js["type"];
-		m_name = js["name"];
-		m_class = js["class"];
-		m_tooltip = js["tooltip"];
-	}
-}
-
 class PluginInfo
 {
 	int m_siteID;
@@ -40,8 +24,11 @@ class PluginInfo
 	array<string> m_screenshots;
 
 	array<TagInfo@> m_tags;
+	array<PluginChangelog@> m_changelogs;
 
 	bool m_isInstalled;
+
+	Net::HttpRequest@ m_changelogRequest;
 
 	PluginInfo(const Json::Value &in js)
 	{
@@ -120,5 +107,39 @@ class PluginInfo
 			m_isInstalled = true;
 			return;
 		}
+	}
+
+	void LoadChangelog() 
+	{
+		@m_changelogRequest = API::Get("plugin/" + m_siteID + "/versions");
+	}
+
+	void CheckChangelog()
+	{
+		if (m_changelogRequest is null || !m_changelogRequest.Finished()) {
+			return;
+		}
+
+		Json::Value js = Json::Parse(m_changelogRequest.String());
+		if (js.GetType() == Json::Type::Object) {
+			error("Unable to fetch changelog for " + m_name + ": \"" + string(js["error"]) + "\"");
+			return;
+		} else if (js.GetType() != Json::Type::Array) {
+			error("Unable to check for updates, unexpected response from server!");
+			return;
+		}
+
+		for (uint i = 0; i < js.Length; i++) {
+			m_changelogs.InsertLast(PluginChangelog(js[i]));
+		}
+	}
+
+	Version GetInstalledVersion()
+	{
+		auto plugin = Meta::GetPluginFromSiteID(m_siteID);
+		if (!m_isInstalled || plugin is null) {
+			return Version("0.0.0");
+		}
+		return Version(plugin.Version);
 	}
 }

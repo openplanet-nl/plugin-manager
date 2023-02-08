@@ -8,6 +8,7 @@ class PluginListTab : Tab
 	int m_total;
 	int m_page;
 	int m_pageCount;
+
 	array<PluginInfo@> m_plugins;
 
 	uint m_lastPageRequestFinished = 0;
@@ -123,7 +124,22 @@ class PluginListTab : Tab
 
 		auto jsItems = js["items"];
 		for (uint i = 0; i < jsItems.Length; i++) {
-			m_plugins.InsertLast(PluginInfo(jsItems[i]));
+			PluginInfo pi(jsItems[i]);
+			if (Setting_ChangelogTooltips && pi.GetInstalledVersion() < pi.m_version) {
+				pi.LoadChangelog();
+			}
+			m_plugins.InsertLast(pi);
+		}
+	}
+
+	void CheckChangelogRequests()
+	{
+		for (uint i = 0; i < m_plugins.Length; i++) {
+			PluginInfo@ pi = m_plugins[i];
+			if (pi.m_changelogs.Length > 0 || pi.m_changelogRequest is null || pi.m_changelogRequest.Error().Length > 0) {
+				continue;
+			}
+			pi.CheckChangelog();
 		}
 
 		m_lastPageRequestFinished = Time::Now;
@@ -144,6 +160,7 @@ class PluginListTab : Tab
 	void Render() override
 	{
 		CheckRequest();
+		CheckChangelogRequests();
 
 		if (m_request !is null && m_pageCount == 0) {
 			UI::Text("Loading list..");
