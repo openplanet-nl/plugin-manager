@@ -3,8 +3,8 @@ class PluginChangelog
 	int m_siteID;
 	int64 m_postTime;
 	Version m_version;
-    bool m_isSigned;
-    string m_changeMessage;
+	bool m_isSigned;
+	string m_changeMessage;
 
 	PluginChangelog(const Json::Value &in js)
 	{
