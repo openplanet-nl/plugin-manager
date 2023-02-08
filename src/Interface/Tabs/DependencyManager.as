@@ -67,7 +67,7 @@ class DependencyManagerTab : Tab
 				UI::TreeAdvanceToLabelPos();
 				UI::Text(colorTag + pluginText);
 			} else {
-				if (UI::TreeNode(colorTag + pluginText, UI::TreeNodeFlags::Leaf)) {
+				if (UI::TreeNode(colorTag + pluginText)) {
 					for (uint i = 0; i < plugin.m_requiredChilds.Length; i++) {
 						DrawPluginLeaf(plugin.m_requiredChilds[i], depth+1, true);
 					}
