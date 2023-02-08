@@ -10,6 +10,8 @@ class DependencyManagerTab : Tab
 	DepLeaf@[] seen; // used to prevent infinite loops
 	DepLeaf@[] tree;
 
+	bool showAllPlugins = false;
+
 	string GetLabel() override { return "Dependencies"; }
 
 	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
@@ -47,6 +49,13 @@ class DependencyManagerTab : Tab
 				LoadDependencyTree();
 				return;
 			}
+			UI::SameLine();
+			showAllPlugins = UI::Checkbox("List all plugins", showAllPlugins);
+			if (UI::IsItemHovered()) {
+				UI::BeginTooltip();
+				UI::Text("If unchecked, only plugins with dependencies are listed");
+				UI::EndTooltip();
+			}
 			UI::Separator();
 		}
 
@@ -66,8 +75,21 @@ class DependencyManagerTab : Tab
 			if (depth > DEPTH_LIMIT) {
 				UI::TreeAdvanceToLabelPos();
 				UI::Text(colorTag + pluginText);
+				return;
 			} else {
-				if (UI::TreeNode(colorTag + pluginText)) {
+				int numChilds = plugin.m_requiredChilds.Length + plugin.m_optionalChilds.Length;
+				int flags = (numChilds == 0) ? UI::TreeNodeFlags::Leaf : UI::TreeNodeFlags::None;
+				if (depth == 0) {
+					flags |= UI::TreeNodeFlags::DefaultOpen;
+					if (!showAllPlugins && numChilds == 0) {
+						return;
+					}
+				}
+				if (UI::TreeNode(colorTag + pluginText+"###"+plugin.m_ident, flags)) {
+					if (numChilds == 0 && depth == 0) {
+						UI::TreeAdvanceToLabelPos();
+						UI::Text("\\$666No dependencies");
+					}
 					for (uint i = 0; i < plugin.m_requiredChilds.Length; i++) {
 						DrawPluginLeaf(plugin.m_requiredChilds[i], depth+1, true);
 					}
