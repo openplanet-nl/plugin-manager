@@ -8,10 +8,9 @@ class PluginListTab : Tab
 	int m_total;
 	int m_page;
 	int m_pageCount;
+	uint m_lastPageRequestFinished = 0;
 
 	array<PluginInfo@> m_plugins;
-
-	uint m_lastPageRequestFinished = 0;
 
 	string GetLabel() override { return "Plugins"; }
 
@@ -130,6 +129,8 @@ class PluginListTab : Tab
 			}
 			m_plugins.InsertLast(pi);
 		}
+
+		m_lastPageRequestFinished = Time::Now;
 	}
 
 	void CheckChangelogRequests()
@@ -141,8 +142,6 @@ class PluginListTab : Tab
 			}
 			pi.CheckChangelog();
 		}
-
-		m_lastPageRequestFinished = Time::Now;
 	}
 
 	void HandleErrorResponse(const string &in message, int code)
