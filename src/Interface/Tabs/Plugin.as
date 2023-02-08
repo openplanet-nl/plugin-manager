@@ -1,9 +1,11 @@
 class PluginTab : Tab
 {
-	Net::HttpRequest@ m_request;
+	Net::HttpRequest@ m_requestMain;
+	Net::HttpRequest@ m_requestChangelog;
 
 	bool m_error = false;
 	string m_errorMessage;
+	string m_changelogFillerMessage = "Loading changelog...";
 
 	int m_siteID;
 	PluginInfo@ m_plugin;
@@ -34,17 +36,18 @@ class PluginTab : Tab
 		m_error = false;
 		m_errorMessage = "";
 
-		@m_request = API::Get("plugin/" + siteID);
+		@m_requestMain = API::Get("plugin/" + siteID);
+		@m_requestChangelog = API::Get("plugin/" + siteID + "/versions");
 	}
 
-	void CheckRequest()
+	void CheckRequestMain()
 	{
 		// If there's a request, check if it has finished
-		if (m_request !is null && m_request.Finished()) {
+		if (m_requestMain !is null && m_requestMain.Finished()) {
 			// Parse the response
-			string res = m_request.String();
-			int resCode = m_request.ResponseCode();
-			@m_request = null;
+			string res = m_requestMain.String();
+			int resCode = m_requestMain.ResponseCode();
+			@m_requestMain = null;
 			auto js = Json::Parse(res);
 
 			// Handle the response
@@ -54,6 +57,30 @@ class PluginTab : Tab
 				HandleErrorResponse(js["error"], resCode);
 			} else {
 				HandleResponse(js);
+			}
+		}
+	}
+
+	void CheckRequestChangelog()
+	{
+		// If there's a request, check if it has finished
+		if (m_requestChangelog !is null && m_requestChangelog.Finished() && m_plugin !is null) {
+			// Parse the response
+			string res = m_requestChangelog.String();
+			int resCode = m_requestChangelog.ResponseCode();
+			@m_requestChangelog = null;
+			auto js = Json::Parse(res);
+
+			// Handle the response
+			if (js.GetType() != Json::Type::Array) {
+				m_changelogFillerMessage = "Error fetching changelog. :(";
+			} else if (js.GetType() == Json::Type::Object && js.HasKey("error")) {
+				m_changelogFillerMessage = "Error fetching changelog. :(";
+				warn(js["error"]);
+			} else {
+				for (uint i = 0; i < js.Length; i++) {
+					m_plugin.m_changelogs.InsertLast(PluginChangelog(js[i]));
+				}
 			}
 		}
 	}
@@ -187,9 +214,10 @@ class PluginTab : Tab
 
 	void Render() override
 	{
-		CheckRequest();
+		CheckRequestMain();
+		CheckRequestChangelog();
 
-		if (m_request !is null) {
+		if (m_requestMain !is null) {
 			UI::Text("Loading plugin..");
 			return;
 		}
@@ -286,6 +314,21 @@ class PluginTab : Tab
 		UI::Separator();
 
 		UI::Markdown(m_plugin.m_description);
+
+		UI::Separator();
+
+		UI::Dummy(vec2(1, UI::GetTextLineHeightWithSpacing()));
+		UI::PushFont(g_fontSubHeader);
+		UI::Text("Versions");
+		UI::PopFont();
+
+		UI::Separator();
+		if (m_plugin.m_changelogs.Length == 0) {
+			UI::Text(m_changelogFillerMessage);
+		} else {
+			Controls::PluginChangelogList(m_plugin, false);
+		}
+
 		UI::EndChild();
 	}
 }
