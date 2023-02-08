@@ -25,7 +25,8 @@ namespace API
 		return Json::Parse(req.String());
 	}
 
-	void GetPluginListAsync() {
+	void GetPluginListAsync()
+	{
 		uint pages = 1;
 		g_cachedAPIPluginList.Resize(0);
 

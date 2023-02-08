@@ -127,22 +127,26 @@ class DependencyManagerTab : Tab
 		}
 	}
 
-	string InstalledPluginString(DepLeaf@ plugin) {
+	string InstalledPluginString(DepLeaf@ plugin)
+	{
 		return plugin.m_name +
 		    " \\$999by " + plugin.m_author +
 			" \\$666(v" + plugin.m_plugin.Version + " installed)";
 	}
 
-	string NotInstalledPluginString(DepLeaf@ plugin) {
+	string NotInstalledPluginString(DepLeaf@ plugin)
+	{
 		return plugin.m_name +
 		    " \\$999by " + plugin.m_author;
 	}
 
-	string MysteryPluginString(DepLeaf@ plugin) {
+	string MysteryPluginString(DepLeaf@ plugin)
+	{
 		return plugin.m_ident;
 	}
 
-	void LoadDependencyTree() {
+	void LoadDependencyTree()
+	{
 		trace("Reloading dependency tree...");
 		seen.Resize(0);
 		tree.Resize(0);
