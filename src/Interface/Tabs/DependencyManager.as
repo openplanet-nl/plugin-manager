@@ -174,4 +174,24 @@ class DependencyManagerTab : Tab
 		}
 		trace("Scanned " + seen.Length + " plugins.");
 	}
+
+	bool isMissingRequirements()
+	{
+		for (uint i = 0; i < tree.Length; i++) {
+			if (tree[i].isMissingRequirements()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool isMissingOptionals()
+	{
+		for (uint i = 0; i < tree.Length; i++) {
+			if (tree[i].isMissingOptionals()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -89,4 +89,24 @@ class DepLeaf {
 		}
 		return -1;
 	}
+
+	bool isMissingRequirements()
+	{
+		for (uint i = 0; i < m_requiredChilds.Length; i++) {
+			if (m_requiredChilds[i].m_plugin is null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool isMissingOptionals()
+	{
+		for (uint i = 0; i < m_optionalChilds.Length; i++) {
+			if (m_optionalChilds[i].m_plugin is null) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
