@@ -114,7 +114,7 @@ class PluginInfo
 	}
 
 	void CheckChangelog() {
-		if (!m_changelogRequest.Finished()) {
+		if (m_changelogRequest is null || !m_changelogRequest.Finished()) {
 			return;
 		}
 

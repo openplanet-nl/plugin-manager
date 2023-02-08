@@ -10,7 +10,6 @@ class PluginListTab : Tab
 	int m_pageCount;
 
 	array<PluginInfo@> m_plugins;
-	array<PluginInfo@> m_pluginsWithChangelogs;
 
 	string GetLabel() override { return "Plugins"; }
 
@@ -121,18 +120,16 @@ class PluginListTab : Tab
 			PluginInfo pi(jsItems[i]);
 			if (Setting_ChangelogTooltips && pi.GetInstalledVersion() < pi.m_version) {
 				pi.LoadChangelog();
-				m_pluginsWithChangelogs.InsertLast(pi);
 			}
 			m_plugins.InsertLast(pi);
 		}
 	}
 
 	void CheckChangelogRequests() {
-		for (uint i = 0; i < m_pluginsWithChangelogs.Length; i++) {
-			PluginInfo@ pi = m_pluginsWithChangelogs[i];
-			if (pi.m_changelogs.Length > 0 || pi.m_changelogRequest.Error().Length > 0) {
-				m_pluginsWithChangelogs.RemoveAt(i);
-				return;
+		for (uint i = 0; i < m_plugins.Length; i++) {
+			PluginInfo@ pi = m_plugins[i];
+			if (pi.m_changelogs.Length > 0 || pi.m_changelogRequest is null || pi.m_changelogRequest.Error().Length > 0) {
+				continue;
 			}
 			pi.CheckChangelog();
 		}
