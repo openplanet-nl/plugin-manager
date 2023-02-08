@@ -1,4 +1,4 @@
-class DependencyManagerTab : Tab
+class DependencyManager
 {
 	string COLOR_RI = Icons::CheckCircle;
 	string COLOR_OI = Icons::CheckCircleO;
@@ -11,8 +11,9 @@ class DependencyManagerTab : Tab
 	DepLeaf@[] tree;
 
 	bool showAllPlugins = false;
+	bool m_visible = false;
 
-	DependencyManagerTab()
+	DependencyManager()
 	{
 		if (!Setting_ColorblindDependencies) {
 			COLOR_RI = "\\$z" + COLOR_RI;
@@ -22,49 +23,48 @@ class DependencyManagerTab : Tab
 		}
 	}
 
-	string GetLabel() override { return Icons::CheckSquareO + " Dependencies"; }
-
-	vec4 GetColor() override { return vec4(0.6f, 0.6f, 0.f, 1); }
-
-	void RenderEmpty()
+	void Render()
 	{
-	}
-
-	void Render() override
-	{
-		if (tree.Length == 0) {
-			LoadDependencyTree();
+		if (!m_visible) {
+			return;
 		}
 
-		if (UI::BeginTable("legend", 2, UI::TableFlags::SizingStretchSame)) {
-			UI::TableNextRow();
-			UI::TableNextColumn();
-			UI::Text(COLOR_RI + "Required dependency");
-			UI::TableNextColumn();
-			UI::Text(COLOR_OI + "Optional dependency");
-			UI::TableNextRow();
-			UI::TableNextColumn();
-		UI::Text(COLOR_RN + "Required dependency (not installed)");
-			UI::TableNextColumn();
-		UI::Text(COLOR_ON + "Optional dependency (not installed)");
-			UI::EndTable();
-			if (UI::Button("Rescan dependencies")) {
+		UI::SetNextWindowSize(800, 500);
+		if (UI::Begin(Icons::CheckSquareO + " Dependency Auditor###PluginManagerDepAudit", m_visible)) {
+			if (tree.Length == 0) {
 				LoadDependencyTree();
-				return;
 			}
-			UI::SameLine();
-			showAllPlugins = UI::Checkbox("List all plugins", showAllPlugins);
-			if (UI::IsItemHovered()) {
-				UI::BeginTooltip();
-				UI::Text("If unchecked, only plugins with dependencies are listed");
-				UI::EndTooltip();
-			}
-			UI::Separator();
-		}
 
-		for (uint i = 0; i < tree.Length; i++) {
-			DrawPluginLeaf(tree[i], 0, true);
+			if (UI::BeginTable("legend", 2, UI::TableFlags::SizingStretchSame)) {
+				UI::TableNextRow();
+				UI::TableNextColumn();
+				UI::Text(COLOR_RI + "Required dependency");
+				UI::TableNextColumn();
+				UI::Text(COLOR_OI + "Optional dependency");
+				UI::TableNextRow();
+				UI::TableNextColumn();
+			UI::Text(COLOR_RN + "Required dependency (not installed)");
+				UI::TableNextColumn();
+			UI::Text(COLOR_ON + "Optional dependency (not installed)");
+				UI::EndTable();
+				if (UI::Button("Rescan dependencies")) {
+					LoadDependencyTree();
+				}
+				UI::SameLine();
+				showAllPlugins = UI::Checkbox("List all plugins", showAllPlugins);
+				if (UI::IsItemHovered()) {
+					UI::BeginTooltip();
+					UI::Text("If unchecked, only plugins with dependencies are listed");
+					UI::EndTooltip();
+				}
+				UI::Separator();
+			}
+
+			for (uint i = 0; i < tree.Length; i++) {
+				DrawPluginLeaf(tree[i], 0, true);
+			}
 		}
+		UI::End();
 	}
 
 	void DrawPluginLeaf(DepLeaf@ plugin, uint depth, bool required)
@@ -117,6 +117,7 @@ class DependencyManagerTab : Tab
 			UI::Text(colorTag + NotInstalledPluginString(plugin) + "\\$z");
 			UI::SameLine();
 			if (UI::Button(Icons::InfoCircle + "###" + plugin.m_ident)) {
+				g_window.m_visible = true;
 				g_window.AddTab(PluginTab(plugin.m_siteID), true);
 			}
 		} else { // we got no fukken clue
@@ -195,3 +196,5 @@ class DependencyManagerTab : Tab
 		return false;
 	}
 }
+
+DependencyManager g_dependencyManager;

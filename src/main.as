@@ -14,6 +14,9 @@ void Main()
 	// Start checking for updates immediately
 	CheckForUpdatesAsyncStartUp();
 
+	// check for missing dependencies
+	g_dependencyManager.LoadDependencyTree();
+
 	// load a list of plugins from the API for later use...
 	API::GetPluginListAsync();
 
@@ -23,6 +26,7 @@ void Main()
 		if (Setting_AutoCheckUpdates) {
 			CheckForUpdatesAsync();
 			API::GetPluginListAsync();
+			g_dependencyManager.LoadDependencyTree();
 		}
 	}
 }
@@ -30,4 +34,5 @@ void Main()
 void RenderInterface()
 {
 	g_window.Render();
+	g_dependencyManager.Render();
 }

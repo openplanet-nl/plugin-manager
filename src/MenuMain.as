@@ -1,7 +1,9 @@
 void RenderMenuMain()
 {
 	string menuText;
-	if (g_availableUpdates.Length > 0) {
+	if (g_dependencyManager.isMissingRequirements()) {
+		menuText = "\\$f33" + Icons::ExclamationTriangle;
+	} else if (g_availableUpdates.Length > 0) {
 		menuText = "\\$f77" + Icons::ArrowCircleUp + " " + g_availableUpdates.Length;
 	} else {
 		menuText = Icons::ShoppingCart;
@@ -11,6 +13,16 @@ void RenderMenuMain()
 	if (UI::BeginMenu(menuText)) {
 		if (UI::MenuItem("\\$f39" + Icons::ShoppingCart + "\\$z Open manager", "", g_window.m_visible)) {
 			g_window.m_visible = !g_window.m_visible;
+		}
+
+		string depManText;
+		if (g_dependencyManager.isMissingRequirements()) {
+			depManText = "\\$f33" + Icons::ExclamationTriangle + "\\$z Audit missing requirements";
+		} else {
+			depManText = "\\$z" + Icons::CheckSquareO + " Open dependency auditor";
+		}
+		if (UI::MenuItem(depManText, "", g_dependencyManager.m_visible)) {
+			g_dependencyManager.m_visible = !g_dependencyManager.m_visible;
 		}
 
 		if (UI::MenuItem(Icons::Refresh + " Check for updates")) {

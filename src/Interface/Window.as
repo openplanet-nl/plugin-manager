@@ -10,7 +10,6 @@ class Window
 	{
 		AddTab(UpdatesTab());
 		AddTab(InstalledTab());
-		AddTab(DependencyManagerTab());
 
 		AddTab(FeaturedTab());
 		AddTab(PopularTab());
