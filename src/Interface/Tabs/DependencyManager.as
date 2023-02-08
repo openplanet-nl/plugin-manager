@@ -12,6 +12,16 @@ class DependencyManagerTab : Tab
 
 	bool showAllPlugins = false;
 
+	DependencyManagerTab()
+	{
+		if (!Setting_ColorblindDependencies) {
+			COLOR_RI = "\\$z" + COLOR_RI;
+			COLOR_OI = "\\$666" + COLOR_OI;
+			COLOR_RN = "\\$f00" + COLOR_RN;
+			COLOR_ON = "\\$666" + COLOR_ON;
+		}
+	}
+
 	string GetLabel() override { return "Dependencies"; }
 
 	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
@@ -24,13 +34,6 @@ class DependencyManagerTab : Tab
 	{
 		if (tree.Length == 0) {
 			LoadDependencyTree();
-		}
-
-		if (!Setting_ColorblindDependencies) {
-			COLOR_RI = "\\$z" + COLOR_RI;
-			COLOR_OI = "\\$666" + COLOR_OI;
-			COLOR_RN = "\\$f00" + COLOR_RN;
-			COLOR_ON = "\\$f88" + COLOR_ON;
 		}
 
 		if (UI::BeginTable("legend", 2, UI::TableFlags::SizingStretchSame)) {
