@@ -116,7 +116,7 @@ class DependencyManagerTab : Tab
 			UI::TreeAdvanceToLabelPos();
 			UI::Text(colorTag + MysteryPluginString(plugin) + "\\$z");
 			UI::SameLine();
-			if (UI::ColoredButton(Icons::ExclamationTriangle, 0.f)) {
+			if (UI::ColoredButton(Icons::ExclamationTriangle+ "###" + plugin.m_ident, 0.f)) {
 				OpenBrowserURL("https://openplanet.dev/plugin/"+plugin.m_ident);
 			}
 			if (UI::IsItemHovered()) {
