@@ -89,5 +89,4 @@ class DepLeaf {
 		}
 		return -1;
 	}
-
 }
