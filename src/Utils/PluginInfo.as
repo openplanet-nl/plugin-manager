@@ -132,7 +132,6 @@ class PluginInfo
 		for (uint i = 0; i < js.Length; i++) {
 			m_changelogs.InsertLast(PluginChangelog(js[i]));
 		}
-		return;
 	}
 
 	Version GetInstalledVersion()
