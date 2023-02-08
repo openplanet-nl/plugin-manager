@@ -22,9 +22,9 @@ class DependencyManagerTab : Tab
 		}
 	}
 
-	string GetLabel() override { return "Dependencies"; }
+	string GetLabel() override { return Icons::CheckSquareO + " Dependencies"; }
 
-	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
+	vec4 GetColor() override { return vec4(0.6f, 0.6f, 0.f, 1); }
 
 	void RenderEmpty()
 	{
