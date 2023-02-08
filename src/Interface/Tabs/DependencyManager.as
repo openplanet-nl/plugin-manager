@@ -138,14 +138,14 @@ class DependencyManagerTab : Tab
 	string InstalledPluginString(DepLeaf@ plugin)
 	{
 		return plugin.m_name +
-		    " \\$999by " + plugin.m_author +
+			" \\$999by " + plugin.m_author +
 			" \\$666(" + plugin.m_plugin.Version + " installed)";
 	}
 
 	string NotInstalledPluginString(DepLeaf@ plugin)
 	{
 		return plugin.m_name +
-		    " \\$999by " + plugin.m_author;
+			" \\$999by " + plugin.m_author;
 	}
 
 	string MysteryPluginString(DepLeaf@ plugin)
