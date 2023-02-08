@@ -109,11 +109,13 @@ class PluginInfo
 		}
 	}
 
-	void LoadChangelog() {
+	void LoadChangelog() 
+	{
 		@m_changelogRequest = API::Get("plugin/" + m_siteID + "/versions");
 	}
 
-	void CheckChangelog() {
+	void CheckChangelog()
+	{
 		if (m_changelogRequest is null || !m_changelogRequest.Finished()) {
 			return;
 		}
