@@ -52,7 +52,7 @@ class DepLeaf {
             if (seenID >= 0) {
                 // we've already seen this plugin, so just add a reference to the array and fuck off
                 childsArray.InsertLast(seen[seenID]);
-                return;
+                continue;
             }
 
             // all installed plugins are already "seen" so we gotta get from API
