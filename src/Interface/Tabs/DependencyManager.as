@@ -72,12 +72,20 @@ class DependencyManagerTab : Tab
 		string colorTag;
 
 		if (plugin.m_plugin !is null) { // plugin is installed
-			colorTag = required ? COLOR_RI : COLOR_OI;
-			string pluginText = InstalledPluginString(plugin);
+			if (depth > 0) {
+				colorTag = required ? COLOR_RI : COLOR_OI;
+			}
+			string pluginText;
+			// check if it's an openplanet bundled plugin...
+			if (plugin.m_plugin.Source == Meta::PluginSource::ApplicationFolder) {
+				pluginText = "\\$f39" + Icons::Heartbeat + "\\$z" + plugin.m_name + " \\$666(built-in)";
+			} else {
+				pluginText = colorTag + InstalledPluginString(plugin);
+			}
 			// don't go too deep
 			if (depth > DEPTH_LIMIT) {
 				UI::TreeAdvanceToLabelPos();
-				UI::Text(colorTag + pluginText);
+				UI::Text(pluginText);
 				return;
 			} else {
 				int numChilds = plugin.m_requiredChilds.Length + plugin.m_optionalChilds.Length;
@@ -88,7 +96,7 @@ class DependencyManagerTab : Tab
 						return;
 					}
 				}
-				if (UI::TreeNode(colorTag + pluginText+"###"+plugin.m_ident, flags)) {
+				if (UI::TreeNode(pluginText+"###"+plugin.m_ident, flags)) {
 					if (numChilds == 0 && depth == 0) {
 						UI::TreeAdvanceToLabelPos();
 						UI::Text("\\$666No dependencies");
