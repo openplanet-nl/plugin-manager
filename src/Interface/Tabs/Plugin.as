@@ -214,6 +214,8 @@ class PluginTab : Tab
 
 	void Render() override
 	{
+		float scale = UI::GetScale();
+
 		CheckRequestMain();
 		CheckRequestChangelog();
 
@@ -229,8 +231,8 @@ class PluginTab : Tab
 
 		vec2 posTop = UI::GetCursorPos();
 
-		const float THUMBNAIL_WIDTH = 250;
-		const float THUMBNAIL_PADDING = 8;
+		const float THUMBNAIL_WIDTH = 250 * scale;
+		const float THUMBNAIL_PADDING = 8 * scale;
 
 		const int SCREENSHOTS_PER_ROW = 3;
 
@@ -283,8 +285,8 @@ class PluginTab : Tab
 			UI::Separator();
 
 			if (UI::BeginTable("Screenshots", SCREENSHOTS_PER_ROW, UI::TableColumnFlags::WidthStretch)) {
-				const float WINDOW_PADDING = 8;
-				const float COL_SPACING = 4;
+				const float WINDOW_PADDING = 8 * scale;
+				const float COL_SPACING = 4 * scale;
 
 				float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (SCREENSHOTS_PER_ROW - 1)) / float(SCREENSHOTS_PER_ROW);
 
