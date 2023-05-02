@@ -259,7 +259,7 @@ class PluginTab : Tab
 			OpenBrowserURL(Setting_BaseURL + m_plugin.m_url);
 		}
 
-		if (m_plugin.m_donateURL != "" && UI::ColoredButton(Icons::Heart + " Support the author", 0.8f)) {
+		if (m_plugin.m_donateURL != "" && UI::ButtonColored(Icons::Heart + " Support the author", 0.8f)) {
 			OpenBrowserURL(m_plugin.m_donateURL);
 		}
 
