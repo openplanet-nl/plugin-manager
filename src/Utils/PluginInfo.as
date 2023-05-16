@@ -109,7 +109,7 @@ class PluginInfo
 		}
 	}
 
-	void LoadChangelog() 
+	void LoadChangelog()
 	{
 		@m_changelogRequest = API::Get("plugin/" + m_siteID + "/versions");
 	}
