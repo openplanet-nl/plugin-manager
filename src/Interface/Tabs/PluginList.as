@@ -136,11 +136,7 @@ class PluginListTab : Tab
 	void CheckChangelogRequests()
 	{
 		for (uint i = 0; i < m_plugins.Length; i++) {
-			PluginInfo@ pi = m_plugins[i];
-			if (pi.m_changelogs.Length > 0 || pi.m_changelogRequest is null || pi.m_changelogRequest.Error().Length > 0) {
-				continue;
-			}
-			pi.CheckChangelog();
+			m_plugins[i].CheckChangelog();
 		}
 	}
 

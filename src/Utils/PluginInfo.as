@@ -120,7 +120,16 @@ class PluginInfo
 			return;
 		}
 
-		Json::Value js = Json::Parse(m_changelogRequest.String());
+		string err = m_changelogRequest.Error();
+		string response = m_changelogRequest.String();
+		@m_changelogRequest = null;
+
+		if (err != "") {
+			error("Unable to fetch changelog for " + m_name + ": " + err);
+			return;
+		}
+
+		Json::Value js = Json::Parse(response);
 		if (js.GetType() == Json::Type::Object) {
 			error("Unable to fetch changelog for " + m_name + ": \"" + string(js["error"]) + "\"");
 			return;
