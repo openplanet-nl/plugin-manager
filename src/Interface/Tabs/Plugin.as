@@ -259,6 +259,14 @@ class PluginTab : Tab
 			OpenBrowserURL(Setting_BaseURL + m_plugin.m_url);
 		}
 
+		if (m_plugin.m_sourceURL != "" && UI::Button(Icons::Code + " Source code")) {
+			OpenBrowserURL(m_plugin.m_sourceURL);
+		}
+
+		if (m_plugin.m_issuesURL != "" && UI::Button(Icons::ExclamationTriangle + " Report an issue")) {
+			OpenBrowserURL(m_plugin.m_issuesURL);
+		}
+
 		if (m_plugin.m_donateURL != "" && UI::ButtonColored(Icons::Heart + " Support the author", 0.8f)) {
 			OpenBrowserURL(m_plugin.m_donateURL);
 		}

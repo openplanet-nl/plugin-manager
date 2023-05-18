@@ -10,6 +10,8 @@ class PluginInfo
 	string m_shortDescription;
 	string m_description;
 	string m_donateURL;
+	string m_sourceURL;
+	string m_issuesURL;
 
 	uint m_filesize;
 	bool m_signed;
@@ -36,14 +38,24 @@ class PluginInfo
 		m_id = js["identifier"];
 
 		m_name = js["name"];
-		m_author = js["author"];
+
+		if (js.HasKey("authoruser")) {
+			m_author = js["authoruser"]["displayname"];
+		}
+
 		m_version = Version(js["version"]);
 
 		m_shortDescription = js["shortdescription"];
 		if (js.HasKey("description")) {
 			m_description = js["description"];
 		}
-		m_donateURL = js["donateurl"];
+
+        if (js.HasKey("links")) {
+            auto jsLinks = js["links"];
+            m_donateURL = jsLinks["donate"].GetType() == Json::Type::String ? jsLinks["donate"] : ""; // setting to null instead of "" crashes openplanet compiler
+            m_sourceURL = jsLinks["source"].GetType() == Json::Type::String ? jsLinks["source"] : "";
+            m_issuesURL = jsLinks["issues"].GetType() == Json::Type::String ? jsLinks["issues"] : "";
+        }
 
 		m_filesize = js["filesize"];
 		m_signed = js["signed"];
