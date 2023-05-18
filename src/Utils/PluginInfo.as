@@ -38,7 +38,7 @@ class PluginInfo
 		m_id = js["identifier"];
 
 		m_name = js["name"];
-		
+
 		if (js.HasKey("authoruser")) {
 			m_author = js["authoruser"]["displayname"];
 		}
@@ -50,11 +50,12 @@ class PluginInfo
 			m_description = js["description"];
 		}
 
-		if (js.HasKey("links")) {
-			m_donateURL = js["links"]["donate"].GetType() == Json::Type::String ? js["links"]["donate"] : "";
-			m_sourceURL = js["links"]["source"].GetType() == Json::Type::String ? js["links"]["source"] : "";
-			m_issuesURL = js["links"]["issues"].GetType() == Json::Type::String ? js["links"]["issues"] : "";
-		}
+        if (js.HasKey("links")) {
+            auto jsLinks = js["links"];
+            m_donateURL = jsLinks["donate"].GetType() == Json::Type::String ? jsLinks["donate"] : ""; // setting to null instead of "" crashes openplanet compiler
+            m_sourceURL = jsLinks["source"].GetType() == Json::Type::String ? jsLinks["source"] : "";
+            m_issuesURL = jsLinks["issues"].GetType() == Json::Type::String ? jsLinks["issues"] : "";
+        }
 
 		m_filesize = js["filesize"];
 		m_signed = js["signed"];
