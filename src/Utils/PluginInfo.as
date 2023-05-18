@@ -10,6 +10,8 @@ class PluginInfo
 	string m_shortDescription;
 	string m_description;
 	string m_donateURL;
+	string m_sourceURL;
+	string m_issuesURL;
 
 	uint m_filesize;
 	bool m_signed;
@@ -36,14 +38,23 @@ class PluginInfo
 		m_id = js["identifier"];
 
 		m_name = js["name"];
-		m_author = js["author"];
+		
+		if (js.HasKey("authoruser")) {
+			m_author = js["authoruser"]["displayname"];
+		}
+
 		m_version = Version(js["version"]);
 
 		m_shortDescription = js["shortdescription"];
 		if (js.HasKey("description")) {
 			m_description = js["description"];
 		}
-		m_donateURL = js["donateurl"];
+
+		if (js.HasKey("links")) {
+			m_donateURL = js["links"]["donate"].GetType() == Json::Type::String ? js["links"]["donate"] : "";
+			m_sourceURL = js["links"]["source"].GetType() == Json::Type::String ? js["links"]["source"] : "";
+			m_issuesURL = js["links"]["issues"].GetType() == Json::Type::String ? js["links"]["issues"] : "";
+		}
 
 		m_filesize = js["filesize"];
 		m_signed = js["signed"];
