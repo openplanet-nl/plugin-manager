@@ -304,10 +304,17 @@ class PluginTab : Tab
 					auto imgScreenshot = Images::CachedFromURL(screenshot);
 					if (imgScreenshot.m_texture !is null) {
 						vec2 imgSize = imgScreenshot.m_texture.GetSize();
-						UI::Image(imgScreenshot.m_texture, vec2(
-							colWidth,
-							imgSize.y / (imgSize.x / colWidth)
-						));
+
+						float r_width = colWidth / imgSize.x;
+						float r_height = (270.0f / (480.0f / colWidth)) / imgSize.y;
+						float coverRatio = Math::Min(r_width, r_height);
+
+						vec2 dst = imgSize * coverRatio;
+						int sideShift = (colWidth - dst.x) / 2;
+
+						UI::Dummy(vec2(sideShift - (6.0f * scale), 270.0f / (480.0f / colWidth)));
+						UI::SameLine();
+						UI::Image(imgScreenshot.m_texture, dst);
 
 						if (UI::IsItemHovered()) {
 							UI::BeginTooltip();
