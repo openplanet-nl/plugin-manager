@@ -15,17 +15,10 @@ namespace Controls
 		auto img = Images::CachedFromURL(plugin.m_image);
 		if (img.m_texture !is null) {
 			vec2 thumbSize = img.m_texture.GetSize();
-
-			float r_width = width / thumbSize.x;
-			float r_height = (270.0f / (480.0f / width)) / thumbSize.y;
-			float coverRatio = Math::Min(r_width, r_height);
-
-			vec2 dst = thumbSize * coverRatio;
-			int sideShift = (width - dst.x) / 2;
-
-			UI::Dummy(vec2(sideShift - (6.0f * scale), 270.0f / (480.0f / width)));
-			UI::SameLine();
-			UI::Image(img.m_texture, dst);
+			UI::Image(img.m_texture, vec2(
+				width,
+				thumbSize.y / (thumbSize.x / width)
+			));
 		} else {
 			float extraPixels = 6.0f * scale;
 			UI::SetCursorPos(UI::GetCursorPos() + vec2(0, 270.0f / (480.0f / width) + extraPixels));
