@@ -312,6 +312,9 @@ class PluginTab : Tab
 						if (UI::IsItemHovered()) {
 							UI::BeginTooltip();
 							UI::Image(imgScreenshot.m_texture, imgSize / 2.0f);
+							if (m_plugin.m_screenshotDescriptions[i].Length > 0) {
+								UI::TextWrapped(m_plugin.m_screenshotDescriptions[i]);
+							}
 							UI::EndTooltip();
 						}
 					}
