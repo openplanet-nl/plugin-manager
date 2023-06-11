@@ -54,4 +54,32 @@ namespace API
 			}
 		}
 	}
+
+	/**
+	 * special version of GetPluginListAsync for use in Render contexts
+	 *
+	 * only supports a single page, but its only use case is in PluginTab
+	 * and if there's enough deps to cause pagination you can fuck right off.
+	 */
+	Net::HttpRequest@ GetPluginList(string[] missing)
+	{
+		string fetchMissing = string::Join(missing, ',');
+		Net::HttpRequest@ req = Get("plugins?idents=" + fetchMissing);
+		return req;
+	}
+
+	void GetPluginListPost(Net::HttpRequest@ request)
+	{
+		Json::Value req = Json::Parse(request.String());
+		for (uint ii = 0; ii < req["items"].Length; ii++) {
+				// kill any existing values
+				for (uint iii = 0; iii < g_cachedAPIPluginList.Length; iii++) { // how deep can we go
+					if (string(g_cachedAPIPluginList[iii]['identifier']) == string(req["items"][ii]['identifier'])) {
+						g_cachedAPIPluginList.RemoveAt(iii);
+					}
+				}
+
+				g_cachedAPIPluginList.InsertLast(req["items"][ii]);
+			}
+	}
 }
