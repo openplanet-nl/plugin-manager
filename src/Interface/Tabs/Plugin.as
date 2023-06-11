@@ -297,6 +297,7 @@ class PluginTab : Tab
 				const float COL_SPACING = 4 * scale;
 
 				float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (SCREENSHOTS_PER_ROW - 1)) / float(SCREENSHOTS_PER_ROW);
+				float colHeight = (270.0f / (480.0f / colWidth));
 
 				for (uint i = 0; i < m_plugin.m_screenshots.Length; i++) {
 					string screenshot = m_plugin.m_screenshots[i];
@@ -306,15 +307,25 @@ class PluginTab : Tab
 						vec2 imgSize = imgScreenshot.m_texture.GetSize();
 
 						float r_width = colWidth / imgSize.x;
-						float r_height = (270.0f / (480.0f / colWidth)) / imgSize.y;
+						float r_height = colHeight / imgSize.y;
 						float coverRatio = Math::Min(r_width, r_height);
-
 						vec2 dst = imgSize * coverRatio;
-						int sideShift = (colWidth - dst.x) / 2;
+						float r_diff = r_width - r_height;
 
-						UI::Dummy(vec2(sideShift - (6.0f * scale), 270.0f / (480.0f / colWidth)));
-						UI::SameLine();
-						UI::Image(imgScreenshot.m_texture, dst);
+						if (r_diff > -0.01 && r_diff < 0.01) { // close enough to 16:9
+							UI::Image(imgScreenshot.m_texture, dst);
+						} else if (r_diff >= 0.01) { // tall
+							int sideShift = (colWidth - dst.x) / 2;
+							UI::Dummy(vec2(sideShift - (6.0f * scale), 1));
+							UI::SameLine();
+							UI::Image(imgScreenshot.m_texture, dst);
+						} else { // thicc
+							int sideShift = (colHeight - dst.y) / 2;
+							UI::Dummy(vec2(1, sideShift - (6.0f * scale)));
+							UI::Image(imgScreenshot.m_texture, dst);
+						}
+
+
 
 						if (UI::IsItemHovered()) {
 							UI::BeginTooltip();
