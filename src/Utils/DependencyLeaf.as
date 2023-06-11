@@ -59,6 +59,7 @@ class DepLeaf {
 			int APIcacheRef = PluginIdentToSiteIDRef(deps[i]);
 			DepLeaf x;
 			if (APIcacheRef == -1) { // could not find in api cache
+				addMissingIdent(deps[i]);
 				x.m_ident = deps[i];
 			} else {
 				Json::Value apiRet = g_cachedAPIPluginList[APIcacheRef];
@@ -78,6 +79,16 @@ class DepLeaf {
 			}
 		}
 		return -1;
+	}
+
+	void addMissingIdent(const string &in ident)
+	{
+		for (uint i = 0; i < g_dependencyManager.missing.Length; i++) {
+			if (g_dependencyManager.missing[i] == ident) {
+				return;
+			}
+		}
+		g_dependencyManager.missing.InsertLast(ident);
 	}
 
 	int GetSeenID(const string &in ident, DepLeaf@[]@ seen)

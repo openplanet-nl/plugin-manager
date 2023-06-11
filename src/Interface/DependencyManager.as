@@ -9,6 +9,7 @@ class DependencyManager
 
 	DepLeaf@[] seen; // used to prevent infinite loops
 	DepLeaf@[] tree;
+	string[] missing;
 
 	bool showAllPlugins = false;
 	bool m_visible = false;
@@ -125,7 +126,7 @@ class DependencyManager
 			UI::TreeAdvanceToLabelPos();
 			UI::Text(colorTag + MysteryPluginString(plugin) + "\\$z");
 			UI::SameLine();
-			if (UI::ColoredButton(Icons::ExclamationTriangle+ "###" + plugin.m_ident, 0.f)) {
+			if (UI::RedButton(Icons::ExclamationTriangle+ "###" + plugin.m_ident)) {
 				OpenBrowserURL("https://openplanet.dev/plugin/"+plugin.m_ident);
 			}
 			if (UI::IsItemHovered()) {
@@ -154,11 +155,12 @@ class DependencyManager
 		return plugin.m_ident;
 	}
 
-	void LoadDependencyTree()
+	void LoadDependencyTree(bool retryMissing = true)
 	{
 		trace("Reloading dependency tree...");
 		seen.Resize(0);
 		tree.Resize(0);
+		missing.Resize(0);
 
 		// first let's populate our top-levels
 		Meta::Plugin@[] loaded = Meta::AllPlugins();
@@ -174,6 +176,11 @@ class DependencyManager
 			tree[i].PopulateChilds(seen);
 		}
 		trace("Scanned " + seen.Length + " plugins.");
+
+		if (retryMissing) { // avoid infinite loop
+			API::GetPluginListAsync(missing);
+			LoadDependencyTree(false);
+		}
 	}
 
 	bool isMissingRequirements()

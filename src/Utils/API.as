@@ -25,24 +25,33 @@ namespace API
 		return Json::Parse(req.String());
 	}
 
-	void GetPluginListAsync()
+	void GetPluginListAsync(string[] missing)
 	{
 		uint pages = 1;
-		g_cachedAPIPluginList.Resize(0);
 
-		for (uint i = 0; i < pages; i++) {
-			Json::Value req = GetAsync("plugins?page=" + i);
+		string fetchMissing = string::Join(missing, ',');
+		if (fetchMissing.Length > 0) {
+			for (uint i = 0; i < pages; i++) {
+				Json::Value req = GetAsync("plugins?idents=" + fetchMissing + "&page=" + i);
 
-			if (pages == 1 && req["pages"] != 1) {
-				pages = req["pages"];
+				if (pages == 1 && req["pages"] != 1) {
+					pages = req["pages"];
+				}
+
+				for (uint ii = 0; ii < req["items"].Length; ii++) {
+					// kill any existing values
+					for (uint iii = 0; iii < g_cachedAPIPluginList.Length; iii++) { // how deep can we go
+						if (string(g_cachedAPIPluginList[iii]['identifier']) == string(req["items"][ii]['identifier'])) {
+							g_cachedAPIPluginList.RemoveAt(iii);
+						}
+					}
+
+					g_cachedAPIPluginList.InsertLast(req["items"][ii]);
+				}
+
+				// nap a bit so we dont wreck the Openplanet API...
+				sleep(500);
 			}
-
-			for (uint ii = 0; ii < req["items"].Length; ii++) {
-				g_cachedAPIPluginList.InsertLast(req["items"][ii]);
-			}
-
-			// nap a bit so we dont wreck the Openplanet API...
-			sleep(500);
 		}
 	}
 }

@@ -17,15 +17,11 @@ void Main()
 	// check for missing dependencies
 	g_dependencyManager.LoadDependencyTree();
 
-	// load a list of plugins from the API for later use...
-	API::GetPluginListAsync();
-
 	// Every 30 minutes, check for updates again
 	while (true) {
 		sleep(30 * 60 * 1000);
 		if (Setting_AutoCheckUpdates) {
 			CheckForUpdatesAsync();
-			API::GetPluginListAsync();
 			g_dependencyManager.LoadDependencyTree();
 		}
 	}
