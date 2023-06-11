@@ -135,15 +135,43 @@ class PluginTab : Tab
 		return true;
 	}
 
+	bool HasMissingRequirements()
+	{
+		if (m_plugin.m_dep_req.Length == 0) return false;
+
+		for (uint i = 0; i < m_plugin.m_dep_req.Length; i++) {
+			auto plug = Meta::GetPluginFromID(m_plugin.m_dep_req[i]);
+			if (plug is null) return true;
+		}
+		return false;
+	}
+
 	void InstallAsync()
 	{
 		m_updating = true;
+
+		// install any required dependents first
+		string[] missingDeps = m_plugin.GetMissingDeps();
+		for (uint i = 0; i < missingDeps.Length; i++) {
+			PluginInfo@ dep = getCachedPluginInfo(missingDeps[i]);
+
+			if (dep is null) {
+				error("Unable to find required plugin info: " + missingDeps[i]);
+				continue;
+			}
+
+			PluginInstallAsync(dep.m_siteID, dep.m_id, dep.m_version);
+		}
 
 		PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_id, m_plugin.m_version);
 
 		m_plugin.m_downloads++;
 		m_plugin.CheckIfInstalled();
 		m_updating = false;
+
+		if (missingDeps.Length > 0) {
+			@m_requestDependencies = API::GetPluginList(missingDeps);
+		}
 	}
 
 	void UpdateAsync()
@@ -209,6 +237,11 @@ class PluginTab : Tab
 			if (UI::GreenButton(Icons::Download + " Install")) {
 				startnew(CoroutineFunc(InstallAsync));
 			}
+			if (UI::IsItemHovered() && HasMissingRequirements()) {
+				UI::BeginTooltip();
+				UI::Text("Note: this will also install any missing required dependencies listed below.");
+				UI::EndTooltip();
+			}
 			return;
 		}
 
@@ -248,16 +281,9 @@ class PluginTab : Tab
 			}
 		} else {
 			// plugin not installed, let's see what info we have on it...
-			Json::Value@ js;
-			for (uint i = 0; i < g_cachedAPIPluginList.Length; i++) {
-				if (string(g_cachedAPIPluginList[i]['identifier']).ToLower() == dep.ToLower()) {
-					@js = g_cachedAPIPluginList[i];
-				}
-			}
-			if (js !is null) {
+			PluginInfo@ x = getCachedPluginInfo(dep);
+			if (x !is null) {
 				// not installed but we have info
-				PluginInfo x(js);
-
 				UI::Text("\\$999"+x.m_name);
 				if (UI::IsItemClicked()) {
 					g_window.AddTab(PluginTab(x.m_siteID), true);
@@ -276,7 +302,22 @@ class PluginTab : Tab
 			}
 
 		}
+	}
 
+	PluginInfo@ getCachedPluginInfo(const string &in ident)
+	{
+		Json::Value@ js;
+		for (uint i = 0; i < g_cachedAPIPluginList.Length; i++) {
+			if (string(g_cachedAPIPluginList[i]['identifier']).ToLower() == ident.ToLower()) {
+				@js = g_cachedAPIPluginList[i];
+			}
+		}
+		if (js !is null) {
+			// not installed but we have info
+			return PluginInfo(js);
+		} else {
+			return null;
+		}
 	}
 
 	void Render() override
