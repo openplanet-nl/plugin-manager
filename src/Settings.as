@@ -7,9 +7,6 @@ bool Setting_ColoredUsernames = true;
 [Setting category="Interface" name="Plugins per row" min=1 max=10]
 int Setting_PluginsPerRow = 3;
 
-[Setting category="Interface" name="Disable colored statuses in Dependency view"]
-bool Setting_ColorblindDependencies = false;
-
 [Setting category="Interface" name="Display changelog when hovering over updatable plugins."]
 bool Setting_ChangelogTooltips = true;
 
