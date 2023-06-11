@@ -82,4 +82,20 @@ namespace API
 				g_cachedAPIPluginList.InsertLast(req["items"][ii]);
 			}
 	}
+
+	PluginInfo@ getCachedPluginInfo(const string &in ident)
+	{
+		Json::Value@ js;
+		for (uint i = 0; i < g_cachedAPIPluginList.Length; i++) {
+			if (string(g_cachedAPIPluginList[i]['identifier']).ToLower() == ident.ToLower()) {
+				@js = g_cachedAPIPluginList[i];
+			}
+		}
+		if (js !is null) {
+			// not installed but we have info
+			return PluginInfo(js);
+		} else {
+			return null;
+		}
+	}
 }

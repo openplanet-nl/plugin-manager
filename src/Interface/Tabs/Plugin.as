@@ -153,7 +153,7 @@ class PluginTab : Tab
 		// install any required dependents first
 		string[] missingDeps = m_plugin.GetMissingDeps();
 		for (uint i = 0; i < missingDeps.Length; i++) {
-			PluginInfo@ dep = getCachedPluginInfo(missingDeps[i]);
+			PluginInfo@ dep = API::getCachedPluginInfo(missingDeps[i]);
 
 			if (dep is null) {
 				error("Unable to find required plugin info: " + missingDeps[i]);
@@ -281,7 +281,7 @@ class PluginTab : Tab
 			}
 		} else {
 			// plugin not installed, let's see what info we have on it...
-			PluginInfo@ x = getCachedPluginInfo(dep);
+			PluginInfo@ x = API::getCachedPluginInfo(dep);
 			if (x !is null) {
 				// not installed but we have info
 				UI::Text("\\$999"+x.m_name);
@@ -301,22 +301,6 @@ class PluginTab : Tab
 				UI::Text("Unknown plugin '"+dep+"'");
 			}
 
-		}
-	}
-
-	PluginInfo@ getCachedPluginInfo(const string &in ident)
-	{
-		Json::Value@ js;
-		for (uint i = 0; i < g_cachedAPIPluginList.Length; i++) {
-			if (string(g_cachedAPIPluginList[i]['identifier']).ToLower() == ident.ToLower()) {
-				@js = g_cachedAPIPluginList[i];
-			}
-		}
-		if (js !is null) {
-			// not installed but we have info
-			return PluginInfo(js);
-		} else {
-			return null;
 		}
 	}
 
