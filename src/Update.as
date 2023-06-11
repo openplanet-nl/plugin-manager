@@ -60,6 +60,18 @@ void PluginUpdateAsync(ref@ update)
 		return;
 	}
 
+	// install any unmet dependencies
+	for (uint i = 0; i < au.m_requirements.Length; i++) {
+		auto plug = Meta::GetPluginFromID(au.m_requirements[i]);
+		if (plug is null) {
+			PluginInfo@ dep = API::getCachedPluginInfo(au.m_requirements[i]);
+			if (dep is null) {
+				error("Unable to find required plugin info: " + au.m_requirements[i]);
+				continue;
+			}
+			PluginInstallAsync(dep.m_siteID, dep.m_id, dep.m_version);
+		}
+	}
 	// If the plugin is currently loaded
 	auto installedPlugin = Meta::GetPluginFromSiteID(au.m_siteID);
 	if (installedPlugin !is null) {
