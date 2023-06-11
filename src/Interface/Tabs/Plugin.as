@@ -325,8 +325,6 @@ class PluginTab : Tab
 							UI::Image(imgScreenshot.m_texture, dst);
 						}
 
-
-
 						if (UI::IsItemHovered()) {
 							UI::BeginTooltip();
 							UI::Image(imgScreenshot.m_texture, imgSize / 2.0f);
