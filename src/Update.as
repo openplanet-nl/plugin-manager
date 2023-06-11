@@ -63,10 +63,10 @@ void PluginUpdateAsync(ref@ update)
 	// If the plugin is currently loaded
 	auto installedPlugin = Meta::GetPluginFromSiteID(au.m_siteID);
 	if (installedPlugin !is null) {
-		// Gather dependency index
+		// Gather dependency index and start topological sort
 		auto index = Meta::PluginIndex();
 		index.AddTree(installedPlugin);
-		index.DependencySort();
+		auto sortedPlugins = index.TopologicalSort();
 
 		// Uninstall the plugin (this will also unload dependents)
 		PluginUninstallAsync(installedPlugin);
@@ -76,9 +76,8 @@ void PluginUpdateAsync(ref@ update)
 		PluginInstallAsync(au.m_siteID, au.m_identifier, Version(au.m_newVersion), false);
 
 		// Load all plugins in the sorted index
-		int count = index.GetCount();
-		for (int i = 0; i < count; i++) {
-			auto item = index.GetItem(i);
+		for (uint i = 0; i < sortedPlugins.Length; i++) {
+			auto item = sortedPlugins[i];
 			Meta::LoadPlugin(item.Path, item.Source, item.Type);
 		}
 
@@ -105,7 +104,7 @@ void UpdateAllPluginsAsync()
 			index.AddTree(installedPlugin);
 		}
 	}
-	index.DependencySort();
+	auto sortedPlugins = index.TopologicalSort();
 
 	// Uninstall and install the new version of each plugin
 	for (uint i = 0; i < g_availableUpdates.Length; i++) {
@@ -129,9 +128,8 @@ void UpdateAllPluginsAsync()
 	}
 
 	// Load all plugins in the sorted index
-	int count = index.GetCount();
-	for (int i = 0; i < count; i++) {
-		auto item = index.GetItem(i);
+	for (uint i = 0; i < sortedPlugins.Length; i++) {
+		auto item = sortedPlugins[i];
 		Meta::LoadPlugin(item.Path, item.Source, item.Type);
 	}
 

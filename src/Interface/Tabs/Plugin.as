@@ -214,6 +214,8 @@ class PluginTab : Tab
 
 	void Render() override
 	{
+		float scale = UI::GetScale();
+
 		CheckRequestMain();
 		CheckRequestChangelog();
 
@@ -229,8 +231,8 @@ class PluginTab : Tab
 
 		vec2 posTop = UI::GetCursorPos();
 
-		const float THUMBNAIL_WIDTH = 250;
-		const float THUMBNAIL_PADDING = 8;
+		const float THUMBNAIL_WIDTH = 250 * scale;
+		const float THUMBNAIL_PADDING = 8 * scale;
 
 		const int SCREENSHOTS_PER_ROW = 3;
 
@@ -257,7 +259,15 @@ class PluginTab : Tab
 			OpenBrowserURL(Setting_BaseURL + m_plugin.m_url);
 		}
 
-		if (m_plugin.m_donateURL != "" && UI::ColoredButton(Icons::Heart + " Support the author", 0.8f)) {
+		if (m_plugin.m_sourceURL != "" && UI::Button(Icons::Code + " Source code")) {
+			OpenBrowserURL(m_plugin.m_sourceURL);
+		}
+
+		if (m_plugin.m_issuesURL != "" && UI::Button(Icons::ExclamationTriangle + " Report an issue")) {
+			OpenBrowserURL(m_plugin.m_issuesURL);
+		}
+
+		if (m_plugin.m_donateURL != "" && UI::ButtonColored(Icons::Heart + " Support the author", 0.8f)) {
 			OpenBrowserURL(m_plugin.m_donateURL);
 		}
 
@@ -283,10 +293,11 @@ class PluginTab : Tab
 			UI::Separator();
 
 			if (UI::BeginTable("Screenshots", SCREENSHOTS_PER_ROW, UI::TableColumnFlags::WidthStretch)) {
-				const float WINDOW_PADDING = 8;
-				const float COL_SPACING = 4;
+				const float WINDOW_PADDING = 8 * scale;
+				const float COL_SPACING = 4 * scale;
 
 				float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (SCREENSHOTS_PER_ROW - 1)) / float(SCREENSHOTS_PER_ROW);
+				float colHeight = (270.0f / (480.0f / colWidth));
 
 				for (uint i = 0; i < m_plugin.m_screenshots.Length; i++) {
 					string screenshot = m_plugin.m_screenshots[i];
@@ -294,10 +305,25 @@ class PluginTab : Tab
 					auto imgScreenshot = Images::CachedFromURL(screenshot);
 					if (imgScreenshot.m_texture !is null) {
 						vec2 imgSize = imgScreenshot.m_texture.GetSize();
-						UI::Image(imgScreenshot.m_texture, vec2(
-							colWidth,
-							imgSize.y / (imgSize.x / colWidth)
-						));
+
+						float r_width = colWidth / imgSize.x;
+						float r_height = colHeight / imgSize.y;
+						float coverRatio = Math::Min(r_width, r_height);
+						vec2 dst = imgSize * coverRatio;
+						float r_diff = r_width - r_height;
+
+						if (r_diff > -0.01 && r_diff < 0.01) { // close enough to 16:9
+							UI::Image(imgScreenshot.m_texture, dst);
+						} else if (r_diff >= 0.01) { // tall
+							int sideShift = (colWidth - dst.x) / 2;
+							UI::Dummy(vec2(sideShift - (6.0f * scale), 1));
+							UI::SameLine();
+							UI::Image(imgScreenshot.m_texture, dst);
+						} else { // thicc
+							int sideShift = (colHeight - dst.y) / 2;
+							UI::Dummy(vec2(1, sideShift - (6.0f * scale)));
+							UI::Image(imgScreenshot.m_texture, dst);
+						}
 
 						if (UI::IsItemHovered()) {
 							UI::BeginTooltip();
