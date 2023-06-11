@@ -14,15 +14,11 @@ void Main()
 	// Start checking for updates immediately
 	CheckForUpdatesAsyncStartUp();
 
-	// check for missing dependencies
-	g_dependencyManager.LoadDependencyTree();
-
 	// Every 30 minutes, check for updates again
 	while (true) {
 		sleep(30 * 60 * 1000);
 		if (Setting_AutoCheckUpdates) {
 			CheckForUpdatesAsync();
-			g_dependencyManager.LoadDependencyTree();
 		}
 	}
 }
@@ -30,5 +26,4 @@ void Main()
 void RenderInterface()
 {
 	g_window.Render();
-	g_dependencyManager.Render();
 }

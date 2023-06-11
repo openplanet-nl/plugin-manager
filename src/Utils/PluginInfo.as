@@ -151,20 +151,14 @@ class PluginInfo
 		string[] missingDeps;
 		for (uint i = 0; i < m_dep_req.Length; i++) {
 			if (Meta::GetPluginFromID(m_dep_req[i]) is null) {
-				// not installed, let's see if it's in the dep manager list
-				if (g_dependencyManager.missing.Find(m_dep_req[i]) < 0) {
-					missingDeps.InsertLast(m_dep_req[i]);
-				}
+				missingDeps.InsertLast(m_dep_req[i]);
 			}
 		}
 
 		// copy paste for optionals
 		for (uint i = 0; i < m_dep_opt.Length; i++) {
 			if (Meta::GetPluginFromID(m_dep_opt[i]) is null) {
-				// not installed, let's see if it's in the dep manager list
-				if (g_dependencyManager.missing.Find(m_dep_opt[i]) < 0) {
-					missingDeps.InsertLast(m_dep_opt[i]);
-				}
+				missingDeps.InsertLast(m_dep_opt[i]);
 			}
 		}
 		return missingDeps;
