@@ -74,6 +74,9 @@ class PluginInfo
 			if (jsScreenshot.GetType() == Json::Type::Object) {
 				m_screenshots.InsertLast(jsScreenshot["uri"]);
 				m_screenshotDescriptions.InsertLast(NullCoalesce(jsScreenshot["description"]));
+			} else if (jsScreenshot.GetType() == Json::Type::String) {
+				m_screenshots.InsertLast(string(jsScreenshot));
+				m_screenshotDescriptions.InsertLast("");
 			}
 		}
 
