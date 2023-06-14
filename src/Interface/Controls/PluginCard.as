@@ -2,6 +2,8 @@ namespace Controls
 {
 	void PluginCard(PluginInfo@ plugin, float width)
 	{
+		if (width <= 0.0f) { return; }
+
 		float scale = UI::GetScale();
 
 		float tagRowHeight = 30 * scale;
