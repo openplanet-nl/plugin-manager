@@ -5,6 +5,18 @@ class AvailableUpdate
 	string m_identifier;
 	string m_oldVersion;
 	string m_newVersion;
+	string[] m_requirements;
+
+	bool HasMissingRequirements()
+	{
+		if (m_requirements.Length == 0) return false;
+
+		for (uint i = 0; i < m_requirements.Length; i++) {
+			auto plug = Meta::GetPluginFromID(m_requirements[i]);
+			if (plug is null) return true;
+		}
+		return false;
+	}
 }
 
 array<AvailableUpdate@> g_availableUpdates;
@@ -65,6 +77,8 @@ void CheckForUpdatesAsync()
 		return;
 	}
 
+	string[] needDepInfo;
+
 	// Go through returned list of versions
 	for (uint i = 0; i < js.Length; i++) {
 		auto jsVersion = js[i];
@@ -97,7 +111,21 @@ void CheckForUpdatesAsync()
 		au.m_identifier = siteIdentifier;
 		au.m_oldVersion = info.m_version.ToString();
 		au.m_newVersion = siteVersion;
+
+		if (jsVersion["required_dependencies"] == Json::Type::Array) {
+			for (uint d = 0; d < jsVersion["required_dependencies"].Length; d++) {
+				au.m_requirements.InsertLast(jsVersion["required_dependencies"][d]);
+				if (API::getCachedPluginInfo(jsVersion["required_dependencies"][d]) is null) {
+					needDepInfo.InsertLast(jsVersion["required_dependencies"][d]);
+				}
+			}
+		}
+
 		g_availableUpdates.InsertLast(au);
+	}
+
+	if (needDepInfo.Length > 0) {
+		API::GetPluginListAsync(needDepInfo);
 	}
 
 	if (g_availableUpdates.Length == 0) {

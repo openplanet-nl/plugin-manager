@@ -1,4 +1,5 @@
 UI::Font@ g_fontHeader;
+Json::Value@[] g_cachedAPIPluginList;
 UI::Font@ g_fontSubHeader;
 
 void Main()

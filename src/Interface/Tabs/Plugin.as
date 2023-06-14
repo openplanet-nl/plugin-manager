@@ -2,6 +2,7 @@ class PluginTab : Tab
 {
 	Net::HttpRequest@ m_requestMain;
 	Net::HttpRequest@ m_requestChangelog;
+	Net::HttpRequest@ m_requestDependencies;
 
 	bool m_error = false;
 	string m_errorMessage;
@@ -61,6 +62,15 @@ class PluginTab : Tab
 		}
 	}
 
+	void CheckRequestDependencies()
+	{
+		// If there's a request, check if it has finished
+		if (m_requestDependencies !is null && m_requestDependencies.Finished()) {
+			API::GetPluginListPost(m_requestDependencies);
+			@m_requestDependencies = null;
+		}
+	}
+
 	void CheckRequestChangelog()
 	{
 		// If there's a request, check if it has finished
@@ -88,6 +98,10 @@ class PluginTab : Tab
 	void HandleResponse(const Json::Value &in js)
 	{
 		@m_plugin = PluginInfo(js);
+		string[] missingDeps = m_plugin.GetMissingDeps();
+		if (missingDeps.Length > 0) {
+			@m_requestDependencies = API::GetPluginList(missingDeps);
+		}
 	}
 
 	void HandleErrorResponse(const string &in message, int code)
@@ -121,15 +135,43 @@ class PluginTab : Tab
 		return true;
 	}
 
+	bool HasMissingRequirements()
+	{
+		if (m_plugin.m_dep_req.Length == 0) return false;
+
+		for (uint i = 0; i < m_plugin.m_dep_req.Length; i++) {
+			auto plug = Meta::GetPluginFromID(m_plugin.m_dep_req[i]);
+			if (plug is null) return true;
+		}
+		return false;
+	}
+
 	void InstallAsync()
 	{
 		m_updating = true;
+
+		// install any required dependents first
+		string[] missingDeps = m_plugin.GetMissingDeps();
+		for (uint i = 0; i < missingDeps.Length; i++) {
+			PluginInfo@ dep = API::getCachedPluginInfo(missingDeps[i]);
+
+			if (dep is null) {
+				error("Unable to find required plugin info: " + missingDeps[i]);
+				continue;
+			}
+
+			PluginInstallAsync(dep.m_siteID, dep.m_id, dep.m_version);
+		}
 
 		PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_id, m_plugin.m_version);
 
 		m_plugin.m_downloads++;
 		m_plugin.CheckIfInstalled();
 		m_updating = false;
+
+		if (missingDeps.Length > 0) {
+			@m_requestDependencies = API::GetPluginList(missingDeps);
+		}
 	}
 
 	void UpdateAsync()
@@ -195,6 +237,11 @@ class PluginTab : Tab
 			if (UI::GreenButton(Icons::Download + " Install")) {
 				startnew(CoroutineFunc(InstallAsync));
 			}
+			if (UI::IsItemHovered() && HasMissingRequirements()) {
+				UI::BeginTooltip();
+				UI::Text("Note: this will also install any missing required dependencies listed below.");
+				UI::EndTooltip();
+			}
 			return;
 		}
 
@@ -212,12 +259,58 @@ class PluginTab : Tab
 		}
 	}
 
+	void RenderDependency(const string &in dep)
+	{
+		// is the plugin installed?
+		auto plug = Meta::GetPluginFromID(dep);
+		if (plug !is null) {
+			if (plug.Source == Meta::PluginSource::ApplicationFolder) { // openplanet bundled
+				UI::Text("\\$f39" + Icons::Heartbeat + "\\$z" + plug.Name + " \\$666(built-in)");
+			} else {
+				UI::Text(plug.Name + " \\$666(installed)");
+				if (UI::IsItemClicked()) {
+					g_window.AddTab(PluginTab(plug.SiteID), true);
+				}
+				if (UI::IsItemHovered()) {
+					UI::SetMouseCursor(UI::MouseCursor::Hand);
+					UI::BeginTooltip();
+					UI::Text(plug.Name + " \\$999by " + plug.Author + " \\$666(" + plug.Version + " installed)");
+					UI::Text("Click to open this plugin in a new tab.");
+					UI::EndTooltip();
+				}
+			}
+		} else {
+			// plugin not installed, let's see what info we have on it...
+			PluginInfo@ x = API::getCachedPluginInfo(dep);
+			if (x !is null) {
+				// not installed but we have info
+				UI::Text("\\$999"+x.m_name);
+				if (UI::IsItemClicked()) {
+					g_window.AddTab(PluginTab(x.m_siteID), true);
+				}
+				if (UI::IsItemHovered()) {
+					UI::SetMouseCursor(UI::MouseCursor::Hand);
+					UI::BeginTooltip();
+					UI::Text(x.m_name + " \\$999by " + x.m_author);
+					UI::Text("Click to open this plugin in a new tab.");
+					UI::EndTooltip();
+				}
+
+			} else {
+				// no fukken clue
+				UI::Text("Unknown plugin '"+dep+"'");
+			}
+
+		}
+	}
+
 	void Render() override
 	{
 		float scale = UI::GetScale();
 
 		CheckRequestMain();
 		CheckRequestChangelog();
+		CheckRequestDependencies();
 
 		if (m_requestMain !is null) {
 			UI::Text("Loading plugin..");
@@ -269,6 +362,36 @@ class PluginTab : Tab
 
 		if (m_plugin.m_donateURL != "" && UI::ButtonColored(Icons::Heart + " Support the author", 0.8f)) {
 			OpenBrowserURL(m_plugin.m_donateURL);
+		}
+
+		if (m_plugin.m_dep_req.Length + m_plugin.m_dep_opt.Length > 0) {
+			UI::Separator();
+			if (m_plugin.m_dep_req.Length > 0) {
+				if (UI::TreeNode("Required dependencies:", UI::TreeNodeFlags::DefaultOpen)) {
+					if (UI::IsItemHovered()) {
+						UI::BeginTooltip();
+						UI::Text("This plugin will not work without all of these plugins installed");
+						UI::EndTooltip();
+					}
+					for (uint i = 0; i < m_plugin.m_dep_req.Length; i++) {
+						RenderDependency(m_plugin.m_dep_req[i]);
+					}
+					UI::TreePop();
+				}
+			}
+			if (m_plugin.m_dep_opt.Length > 0) {
+				if (UI::TreeNode("Optional dependencies:", UI::TreeNodeFlags::DefaultOpen)) {
+					if (UI::IsItemHovered()) {
+						UI::BeginTooltip();
+						UI::Text("This plugin provides enhanced functionality if these plugins are installed");
+						UI::EndTooltip();
+					}
+					for (uint i = 0; i < m_plugin.m_dep_opt.Length; i++) {
+						RenderDependency(m_plugin.m_dep_opt[i]);
+					}
+					UI::TreePop();
+				}
+			}
 		}
 
 		UI::EndChild();

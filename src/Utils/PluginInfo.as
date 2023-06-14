@@ -28,6 +28,11 @@ class PluginInfo
 	array<TagInfo@> m_tags;
 	array<PluginChangelog@> m_changelogs;
 
+	array<string> m_dep_req;
+	array<string> m_dep_opt;
+
+	Json::Value@ m_dep_info;
+
 	bool m_isInstalled;
 
 	Net::HttpRequest@ m_changelogRequest;
@@ -50,12 +55,24 @@ class PluginInfo
 			m_description = js["description"];
 		}
 
-        if (js.HasKey("links")) {
-            auto jsLinks = js["links"];
-            m_donateURL = jsLinks["donate"].GetType() == Json::Type::String ? jsLinks["donate"] : ""; // setting to null instead of "" crashes openplanet compiler
-            m_sourceURL = jsLinks["source"].GetType() == Json::Type::String ? jsLinks["source"] : "";
-            m_issuesURL = jsLinks["issues"].GetType() == Json::Type::String ? jsLinks["issues"] : "";
-        }
+		if (js.HasKey("links")) {
+				auto jsLinks = js["links"];
+				m_donateURL = jsLinks["donate"].GetType() == Json::Type::String ? jsLinks["donate"] : ""; // setting to null instead of "" crashes openplanet compiler
+				m_sourceURL = jsLinks["source"].GetType() == Json::Type::String ? jsLinks["source"] : "";
+				m_issuesURL = jsLinks["issues"].GetType() == Json::Type::String ? jsLinks["issues"] : "";
+		}
+
+		if (js.HasKey("dependencies") && js["dependencies"].GetType() == Json::Type::Array) {
+			for (uint i = 0; i < js["dependencies"].Length; i++) {
+				m_dep_req.InsertLast(js["dependencies"][i]);
+			}
+		}
+
+		if (js.HasKey("optional_dependencies") && js["optional_dependencies"].GetType() == Json::Type::Array) {
+			for (uint i = 0; i < js["optional_dependencies"].Length; i++) {
+				m_dep_opt.InsertLast(js["optional_dependencies"][i]);
+			}
+		}
 
 		m_filesize = js["filesize"];
 		m_signed = js["signed"];
@@ -119,6 +136,32 @@ class PluginInfo
 			m_isInstalled = true;
 			return;
 		}
+	}
+
+	void LoadDependencyInfo()
+	{
+		string[] missingDeps = GetMissingDeps();
+		if (missingDeps.Length > 0) {
+			API::GetPluginListAsync(missingDeps);
+		}
+	}
+
+	string[] GetMissingDeps()
+	{
+		string[] missingDeps;
+		for (uint i = 0; i < m_dep_req.Length; i++) {
+			if (Meta::GetPluginFromID(m_dep_req[i]) is null) {
+				missingDeps.InsertLast(m_dep_req[i]);
+			}
+		}
+
+		// copy paste for optionals
+		for (uint i = 0; i < m_dep_opt.Length; i++) {
+			if (Meta::GetPluginFromID(m_dep_opt[i]) is null) {
+				missingDeps.InsertLast(m_dep_opt[i]);
+			}
+		}
+		return missingDeps;
 	}
 
 	void LoadChangelog()
