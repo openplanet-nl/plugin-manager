@@ -24,6 +24,7 @@ class PluginInfo
 	string m_url;
 
 	array<string> m_screenshots;
+	array<string> m_screenshotDescriptions;
 
 	array<TagInfo@> m_tags;
 	array<PluginChangelog@> m_changelogs;
@@ -52,9 +53,9 @@ class PluginInfo
 
         if (js.HasKey("links")) {
             auto jsLinks = js["links"];
-            m_donateURL = jsLinks["donate"].GetType() == Json::Type::String ? jsLinks["donate"] : ""; // setting to null instead of "" crashes openplanet compiler
-            m_sourceURL = jsLinks["source"].GetType() == Json::Type::String ? jsLinks["source"] : "";
-            m_issuesURL = jsLinks["issues"].GetType() == Json::Type::String ? jsLinks["issues"] : "";
+            m_donateURL = NullCoalesce(jsLinks["donate"]);
+            m_sourceURL = NullCoalesce(jsLinks["source"]);
+            m_issuesURL = NullCoalesce(jsLinks["issues"]);
         }
 
 		m_filesize = js["filesize"];
@@ -70,8 +71,12 @@ class PluginInfo
 		auto jsScreenshots = js["screenshots"];
 		for (uint i = 0; i < jsScreenshots.Length; i++) {
 			auto jsScreenshot = jsScreenshots[i];
-			if (jsScreenshot.GetType() == Json::Type::String) {
-				m_screenshots.InsertLast(jsScreenshot);
+			if (jsScreenshot.GetType() == Json::Type::Object) {
+				m_screenshots.InsertLast(jsScreenshot["uri"]);
+				m_screenshotDescriptions.InsertLast(NullCoalesce(jsScreenshot["description"]));
+			} else if (jsScreenshot.GetType() == Json::Type::String) {
+				m_screenshots.InsertLast(string(jsScreenshot));
+				m_screenshotDescriptions.InsertLast("");
 			}
 		}
 
@@ -162,5 +167,14 @@ class PluginInfo
 			return Version("0.0.0");
 		}
 		return Version(plugin.Version);
+	}
+
+	/**
+	 * one day ?? my beloved will return from the war
+	 */
+	string NullCoalesce(Json::Value j, const string &in ncVal = "")
+	{
+		if (j.GetType() == Json::Type::Null) return ncVal;
+		return j;
 	}
 }
