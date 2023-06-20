@@ -315,12 +315,12 @@ class PluginTab : Tab
 						if (r_diff > -0.01 && r_diff < 0.01) { // close enough to 16:9
 							UI::Image(imgScreenshot.m_texture, dst);
 						} else if (r_diff >= 0.01) { // tall
-							int sideShift = (colWidth - dst.x) / 2;
+							int sideShift = int((colWidth - dst.x) / 2.0f);
 							UI::Dummy(vec2(sideShift - (6.0f * scale), 1));
 							UI::SameLine();
 							UI::Image(imgScreenshot.m_texture, dst);
 						} else { // thicc
-							int sideShift = (colHeight - dst.y) / 2;
+							int sideShift = int((colHeight - dst.y) / 2.0f);
 							UI::Dummy(vec2(1, sideShift - (6.0f * scale)));
 							UI::Image(imgScreenshot.m_texture, dst);
 						}
