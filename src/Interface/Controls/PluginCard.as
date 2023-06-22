@@ -66,6 +66,20 @@ namespace Controls
 			}
 		}
 
+		// also draw alert on broken plugins
+		if (plugin.m_broken) {
+			tagPos = windowPos + imagePos + vec2(6, 6 + (tagRowHeight * tagRow));
+			string text = Icons::ExclamationTriangle + " Broken";
+			DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_DANGER);
+			tagRow++;
+
+			if (UI::IsItemHovered()) {
+				UI::BeginTooltip();
+				UI::Text("This plugin is been marked as broken! It may no longer be working as intended, might be broken, or might be very unstable.");
+				UI::EndTooltip();
+			}
+		}
+
 		// Remember where our text will go
 		vec2 textPos = UI::GetCursorPos();
 

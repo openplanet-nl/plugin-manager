@@ -15,6 +15,7 @@ class PluginInfo
 
 	uint m_filesize;
 	bool m_signed;
+	bool m_broken;
 
 	int64 m_postTime;
 	int64 m_updateTime;
@@ -60,6 +61,7 @@ class PluginInfo
 
 		m_filesize = js["filesize"];
 		m_signed = js["signed"];
+		m_broken = js["broken"];
 
 		m_postTime = js["posttime"];
 		m_updateTime = js["updatetime"];

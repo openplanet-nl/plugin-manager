@@ -38,6 +38,7 @@ class InstalledTab : PluginListTab
 			listIds += tostring(ids[i]);
 		}
 		params.Set("ids", listIds);
+		params.Set("filterBroken", "false");
 	}
 
 	void StartRequest() override
