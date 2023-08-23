@@ -111,11 +111,6 @@ class PluginTab : Tab
 			if (installedPlugin.Type == Meta::PluginType::Folder) {
 				return false;
 			}
-
-			// If the installed plugin comes from a titlepack, it's not installable
-			if (installedPlugin.Source == Meta::PluginSource::TitlePack) {
-				return false;
-			}
 		}
 
 		return true;
