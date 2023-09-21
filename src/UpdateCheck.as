@@ -45,7 +45,7 @@ void CheckForUpdatesAsync()
 		if (info.m_siteID > 0) {
 			ids += info.m_siteID + ",";
 		} else {
-			ids += identifier + ",";
+			ids += Net::UrlEncode(identifier) + ",";
 		}
 	}
 
