@@ -10,6 +10,8 @@ class PluginListTab : Tab
 	int m_pageCount;
 	uint m_lastPageRequestFinished = 0;
 
+	Controls::Pagination m_pagination;
+
 	array<PluginInfo@> m_plugins;
 
 	string GetLabel() override { return "Plugins"; }
@@ -59,7 +61,11 @@ class PluginListTab : Tab
 	void StartRequest()
 	{
 		Clear();
-		StartRequestForPage(0);
+		int defaultPage = 0;
+		if (Setting_TabsPagination) {
+			defaultPage = m_pagination.page;
+		}
+		StartRequestForPage(defaultPage);
 	}
 
 	void StartRequestForPage(int page)
@@ -121,7 +127,17 @@ class PluginListTab : Tab
 		m_page = js["page"];
 		m_pageCount = js["pages"];
 
+		m_pagination.total = m_total;
+		m_pagination.page = m_page;
+		m_pagination.pageCount = m_pageCount;
+
 		auto jsItems = js["items"];
+
+		if (Setting_TabsPagination) {
+			UI::SetScrollY(0);
+			m_plugins.Resize(0);
+		}
+
 		for (uint i = 0; i < jsItems.Length; i++) {
 			PluginInfo pi(jsItems[i]);
 			if (Setting_ChangelogTooltips && pi.GetInstalledVersion() < pi.m_version) {
@@ -188,17 +204,26 @@ class PluginListTab : Tab
 			if (haveMorePages) {
 				UI::TableNextRow(UI::TableRowFlags::None, rowHeight);
 				UI::TableNextColumn();
-				string infiniteScrollMsg = (m_request is null ? "Scroll to load" : "Loading") + " page " + (m_page + 2);
-				UI::Dummy(vec2(0, rowHeight / 3.0));
-				UI::Text(infiniteScrollMsg);
+				if (!Setting_TabsPagination) {
+					string infiniteScrollMsg = (m_request is null ? "Scroll to load" : "Loading") + " page " + (m_page + 2);
+					UI::Dummy(vec2(0, rowHeight / 3.0));
+					UI::Text(infiniteScrollMsg);
+				}
 			}
 			UI::EndTable();
 
-			// after >500ms since the last request, get the next page if there is excess vertical space or when we scroll to just a bit before the final row is in view
-			bool waitedLongEnough = m_lastPageRequestFinished + 500 < Time::Now;
-			bool scrolledNearEnd = UI::GetScrollMaxY() == 0 || UI::GetScrollY() > (UI::GetScrollMaxY() - rowHeight);
-			if (waitedLongEnough && scrolledNearEnd && haveMorePages && m_request is null) {
-				StartRequestForPage(m_page + 1);
+			if (Setting_TabsPagination) {
+				m_pagination.Render();
+				if (m_pagination.isPageRequested) {
+					StartRequestForPage(m_pagination.requestedPageIndex);
+				}
+			} else {
+				// after >500ms since the last request, get the next page if there is excess vertical space or when we scroll to just a bit before the final row is in view
+				bool waitedLongEnough = m_lastPageRequestFinished + 500 < Time::Now;
+				bool scrolledNearEnd = UI::GetScrollMaxY() == 0 || UI::GetScrollY() > (UI::GetScrollMaxY() - rowHeight);
+				if (waitedLongEnough && scrolledNearEnd && haveMorePages && m_request is null) {
+					StartRequestForPage(m_page + 1);
+				}
 			}
 		}
 	}
