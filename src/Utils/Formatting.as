@@ -1,8 +1,8 @@
 string TransformUsername(const string &in username)
 {
 	if (Setting_ColoredUsernames) {
-		return ColoredString(username);
+		return Text::OpenplanetFormatCodes(username);
 	} else {
-		return StripFormatCodes(username);
+		return Text::StripFormatCodes(username);
 	}
 }
