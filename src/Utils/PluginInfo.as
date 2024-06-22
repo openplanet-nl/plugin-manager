@@ -52,12 +52,12 @@ class PluginInfo
 			m_description = js["description"];
 		}
 
-        if (js.HasKey("links")) {
-            auto jsLinks = js["links"];
-            m_donateURL = NullCoalesce(jsLinks["donate"]);
-            m_sourceURL = NullCoalesce(jsLinks["source"]);
-            m_issuesURL = NullCoalesce(jsLinks["issues"]);
-        }
+		if (js.HasKey("links")) {
+			auto jsLinks = js["links"];
+			m_donateURL = NullCoalesce(jsLinks["donate"]);
+			m_sourceURL = NullCoalesce(jsLinks["source"]);
+			m_issuesURL = NullCoalesce(jsLinks["issues"]);
+		}
 
 		m_filesize = js["filesize"];
 		m_signed = js["signed"];
