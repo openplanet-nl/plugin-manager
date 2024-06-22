@@ -84,7 +84,7 @@ namespace Controls
 		vec2 textPos = UI::GetCursorPos();
 
 		UI::Text(plugin.m_name);
-		UI::TextDisabled("By " + TransformUsername(plugin.m_author));
+		UI::TextDisabled("By " + plugin.GetAuthorNames());
 
 		UI::SetCursorPos(textPos + vec2(width - 40 * scale, 5 * scale));
 		if (UI::Button("Info")) {

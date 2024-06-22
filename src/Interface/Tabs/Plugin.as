@@ -276,7 +276,7 @@ class PluginTab : Tab
 		UI::Text(m_plugin.m_name);
 		UI::PopFont();
 
-		UI::TextDisabled("Version " + m_plugin.m_version.ToString() + " by " + TransformUsername(m_plugin.m_author));
+		UI::TextDisabled("Version " + m_plugin.m_version.ToString() + " by " + m_plugin.GetAuthorNames());
 
 		for (uint i = 0; i < m_plugin.m_tags.Length; i++) {
 			Controls::PluginTag(m_plugin.m_tags[i]);

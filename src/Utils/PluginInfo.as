@@ -4,7 +4,7 @@ class PluginInfo
 	string m_id;
 
 	string m_name;
-	string m_author;
+	array<AuthorInfo@> m_authors;
 	Version m_version;
 
 	string m_shortDescription;
@@ -41,8 +41,11 @@ class PluginInfo
 
 		m_name = js["name"];
 
-		if (js.HasKey("authoruser")) {
-			m_author = js["authoruser"]["displayname"];
+		if (js.HasKey("authors")) {
+			auto jsAuthors = js["authors"];
+			for (uint i = 0; i < jsAuthors.Length; i++) {
+				m_authors.InsertLast(AuthorInfo(jsAuthors[i]));
+			}
 		}
 
 		m_version = Version(js["version"]);
@@ -88,6 +91,28 @@ class PluginInfo
 		}
 
 		CheckIfInstalled();
+	}
+
+	string GetAuthorNames()
+	{
+		switch (m_authors.Length) {
+			case 0: return "n/a";
+			case 1: return m_authors[0].GetDisplayName();
+			case 2: return m_authors[0].GetDisplayName() + " and " + m_authors[1].GetDisplayName();
+			default:
+				{
+					string ret;
+					for (uint i = 0; i < m_authors.Length - 1; i++) {
+						auto author = m_authors[i];
+						if (i > 0) {
+							ret += ", ";
+						}
+						ret += author.GetDisplayName();
+					}
+					ret += ", and " + m_authors[m_authors.Length - 1].GetDisplayName();
+					return ret;
+				}
+		}
 	}
 
 	Meta::Plugin@ GetInstalledPlugin()
