@@ -93,6 +93,24 @@ class PluginInfo
 		CheckIfInstalled();
 	}
 
+	void CheckIfInstalled()
+	{
+		m_isInstalled = false;
+
+		// If the plugin is loaded, it's installed
+		if (GetInstalledPlugin() !is null) {
+			m_isInstalled = true;
+			return;
+		}
+
+		// If the file exists in the plugin folder, it's installed
+		string path = IO::FromDataFolder("Plugins/" + m_id + ".op");
+		if (IO::FileExists(path)) {
+			m_isInstalled = true;
+			return;
+		}
+	}
+
 	string GetAuthorNames()
 	{
 		switch (m_authors.Length) {
@@ -115,6 +133,15 @@ class PluginInfo
 		}
 	}
 
+	bool IsManagedByManager()
+	{
+		if (!m_isInstalled) {
+			return false;
+		}
+		auto plugin = GetInstalledPlugin();
+		return plugin !is null && plugin.Type == Meta::PluginType::Zip;
+	}
+
 	Meta::Plugin@ GetInstalledPlugin()
 	{
 		// Try to match the plugin by site ID first
@@ -135,22 +162,13 @@ class PluginInfo
 		return null;
 	}
 
-	void CheckIfInstalled()
+	Version GetInstalledVersion()
 	{
-		m_isInstalled = false;
-
-		// If the plugin is loaded, it's installed
-		if (GetInstalledPlugin() !is null) {
-			m_isInstalled = true;
-			return;
+		auto plugin = GetInstalledPlugin();
+		if (!m_isInstalled || plugin is null) {
+			return Version("0.0.0");
 		}
-
-		// If the file exists in the plugin folder, it's installed
-		string path = IO::FromDataFolder("Plugins/" + m_id + ".op");
-		if (IO::FileExists(path)) {
-			m_isInstalled = true;
-			return;
-		}
+		return Version(plugin.Version);
 	}
 
 	void LoadChangelog()
@@ -185,15 +203,6 @@ class PluginInfo
 		for (uint i = 0; i < js.Length; i++) {
 			m_changelogs.InsertLast(PluginChangelog(js[i]));
 		}
-	}
-
-	Version GetInstalledVersion()
-	{
-		auto plugin = Meta::GetPluginFromSiteID(m_siteID);
-		if (!m_isInstalled || plugin is null) {
-			return Version("0.0.0");
-		}
-		return Version(plugin.Version);
 	}
 
 	/**
