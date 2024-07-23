@@ -7,6 +7,9 @@ int Setting_PluginsPerRow = 3;
 [Setting category="Interface" name="Display changelog when hovering over updatable plugins."]
 bool Setting_ChangelogTooltips = true;
 
+[Setting category="Interface" name="Enable tabs pagination"]
+bool Setting_TabsPagination = false;
+
 [Setting category="Advanced" name="Base URL" description="Only change if you know what you're doing!"]
 string Setting_BaseURL = "https://openplanet.dev/";
 
