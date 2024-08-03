@@ -52,7 +52,7 @@ namespace Controls
 			}
 		}
 
-		// draw alert if unsigned
+		// Draw tag when unsigned
 		if (!plugin.m_signed) {
 			tagPos = windowPos + imagePos + vec2(6, 6 + (tagRowHeight * tagRow));
 			string text = Icons::Code + " Unsigned";
@@ -66,7 +66,7 @@ namespace Controls
 			}
 		}
 
-		// also draw alert on broken plugins
+		// Draw tag on broken plugins
 		if (plugin.m_broken) {
 			tagPos = windowPos + imagePos + vec2(6, 6 + (tagRowHeight * tagRow));
 			string text = Icons::ExclamationTriangle + " Broken";
