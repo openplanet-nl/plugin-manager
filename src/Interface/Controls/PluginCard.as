@@ -6,8 +6,6 @@ namespace Controls
 
 		float scale = UI::GetScale();
 
-		float tagRowHeight = 30 * scale;
-
 		UI::PushID(plugin);
 
 		vec2 windowPos = UI::GetWindowPos();
@@ -26,20 +24,20 @@ namespace Controls
 			UI::SetCursorPos(UI::GetCursorPos() + vec2(0, 270.0f / (480.0f / width) + extraPixels));
 		}
 
+		// Start drawing tags on this card
+		vec2 tagPos = windowPos + imagePos + vec2(6, 6);
+		float tagRowHeight = 30 * scale;
+
 		// Draw an installed tag on top of the image if it's installed
-		uint tagRow = 0;
-		vec2 tagPos;
 		if (plugin.GetInstalledPlugin() !is null) {
-			tagPos = windowPos + imagePos + vec2(6, 6 + (tagRowHeight * tagRow));
 			DrawTag(tagPos, Icons::CheckCircle + " Installed", Controls::TAG_COLOR_PRIMARY);
-			tagRow++;
+			tagPos.y += tagRowHeight;
 
 			// Draw an updatable tag on top of the image if it's installed and updatable
 			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
-				tagPos = windowPos + imagePos + vec2(6, 6 + (tagRowHeight * tagRow));
 				string text = Icons::ArrowCircleUp + " Update!";
 				DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_WARNING);
-				tagRow++;
+				tagPos.y += tagRowHeight;
 
 				if(Setting_ChangelogTooltips) {
 					if (UI::IsItemHovered()) {
@@ -54,10 +52,8 @@ namespace Controls
 
 		// Draw tag when unsigned
 		if (!plugin.m_signed) {
-			tagPos = windowPos + imagePos + vec2(6, 6 + (tagRowHeight * tagRow));
-			string text = Icons::Code + " Unsigned";
-			DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_DARK);
-			tagRow++;
+			DrawTagWithInvisButton(tagPos, windowPos, Icons::Code + " Unsigned", Controls::TAG_COLOR_DARK);
+			tagPos.y += tagRowHeight;
 
 			if (UI::IsItemHovered()) {
 				UI::BeginTooltip();
@@ -68,10 +64,8 @@ namespace Controls
 
 		// Draw tag on broken plugins
 		if (plugin.m_broken) {
-			tagPos = windowPos + imagePos + vec2(6, 6 + (tagRowHeight * tagRow));
-			string text = Icons::ExclamationTriangle + " Broken";
-			DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_DANGER);
-			tagRow++;
+			DrawTagWithInvisButton(tagPos, windowPos, Icons::ExclamationTriangle + " Broken", Controls::TAG_COLOR_DANGER);
+			tagPos.y += tagRowHeight;
 
 			if (UI::IsItemHovered()) {
 				UI::BeginTooltip();
