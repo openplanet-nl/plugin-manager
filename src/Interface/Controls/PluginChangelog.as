@@ -31,16 +31,12 @@ namespace Controls
 			if (!v.m_isSigned) {
 				UI::SameLine();
 				UI::TextDisabled(Icons::Code + " Unsigned");
+				UI::SetItemTooltip("This release is unsigned and requires developer mode.");
 			}
 			UI::PopFont();
-			if (!v.m_isSigned && UI::IsItemHovered()) {
-				UI::BeginTooltip();
-				UI::Text("This release is unsigned and requires developer mode.");
-				UI::EndTooltip();
-			}
 
 			if (v.m_changeMessage.Length == 0 && i == (plugin.m_changelogs.Length-1)) {
-				UI::Markdown("*Initial release*");
+				UI::Text("Initial release");
 			} else {
 				UI::Markdown(v.m_changeMessage);
 			}

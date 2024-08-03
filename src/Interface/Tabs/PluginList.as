@@ -14,7 +14,7 @@ class PluginListTab : Tab
 
 	string GetLabel() override { return "Plugins"; }
 
-	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
+	vec4 GetColor() override { return vec4(0.2f, 0.2f, 0.2f, 0.7f); }
 
 	void GetRequestTags(array<string>@ tags)
 	{
@@ -170,34 +170,35 @@ class PluginListTab : Tab
 			return;
 		}
 
-		if (UI::BeginTable("Plugins", Setting_PluginsPerRow, UI::TableColumnFlags::WidthStretch)) {
-			const float WINDOW_PADDING = 8;
-			const float COL_SPACING = 4;
-			float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (Setting_PluginsPerRow - 1)) / float(Setting_PluginsPerRow);
-			for (uint i = 0; i < m_plugins.Length; i++) {
-				UI::TableNextColumn();
-				Controls::PluginCard(m_plugins[i], colWidth);
+		if (Setting_ViewStyle == ViewStyle::Rows) {
+			if (UI::BeginTable("Plugins", 3, UI::TableFlags::RowBg)) {
+				UI::TableSetupColumn("##Image", UI::TableColumnFlags::WidthFixed, 95);
+				UI::TableSetupColumn("##Plugin");
+				UI::TableSetupColumn("##Actions", UI::TableColumnFlags::WidthFixed, 70);
+				for (uint i = 0; i < m_plugins.Length; i++) {
+					Controls::PluginRow(m_plugins[i]);
+				}
+				UI::EndTable();
 			}
-
-			float rowHeight = Math::Ceil(UI::GetScrollMaxY() / (m_plugins.Length / Setting_PluginsPerRow + 1));
-
-			// draw a message before we check for being near the end
-			bool haveMorePages = m_page + 1 < m_pageCount;
-			if (haveMorePages) {
-				UI::TableNextRow(UI::TableRowFlags::None, rowHeight);
-				UI::TableNextColumn();
-				string infiniteScrollMsg = (m_request is null ? "Scroll to load" : "Loading") + " page " + (m_page + 2);
-				UI::Dummy(vec2(0, rowHeight / 3.0));
-				UI::Text(infiniteScrollMsg);
+		} else {
+			if (UI::BeginTable("Plugins", Setting_PluginsPerRow, UI::TableColumnFlags::WidthStretch)) {
+				const float WINDOW_PADDING = 8;
+				const float COL_SPACING = 4;
+				float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (Setting_PluginsPerRow - 1)) / float(Setting_PluginsPerRow);
+				for (uint i = 0; i < m_plugins.Length; i++) {
+					UI::TableNextColumn();
+					Controls::PluginCard(m_plugins[i], colWidth);
+				}
+				UI::EndTable();
 			}
-			UI::EndTable();
+		}
 
-			// after >500ms since the last request, get the next page if there is excess vertical space or when we scroll to just a bit before the final row is in view
-			bool waitedLongEnough = m_lastPageRequestFinished + 500 < Time::Now;
-			bool scrolledNearEnd = UI::GetScrollMaxY() == 0 || UI::GetScrollY() > (UI::GetScrollMaxY() - rowHeight);
-			if (waitedLongEnough && scrolledNearEnd && haveMorePages && m_request is null) {
-				StartRequestForPage(m_page + 1);
-			}
+		// Handle automatic page loading
+		bool haveMorePages = m_page + 1 < m_pageCount;
+		bool waitedLongEnough = m_lastPageRequestFinished + 500 < Time::Now;
+		bool scrolledNearEnd = UI::GetScrollMaxY() == 0 || UI::GetScrollY() >= UI::GetScrollMaxY();
+		if (waitedLongEnough && scrolledNearEnd && haveMorePages && m_request is null) {
+			StartRequestForPage(m_page + 1);
 		}
 	}
 }

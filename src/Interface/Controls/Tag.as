@@ -1,6 +1,6 @@
 namespace Controls
 {
-	const vec4 TAG_COLOR         = vec4( 30/255.0f,  32/255.0f,  33/255.0f, 1);
+	const vec4 TAG_COLOR         = vec4( 0, 0, 0, 0.7f);
 	const vec4 TAG_COLOR_PRIMARY = vec4(219/255.0f,   0/255.0f, 110/255.0f, 1);
 	const vec4 TAG_COLOR_INFO    = vec4( 62/255.0f, 142/255.0f, 208/255.0f, 1);
 	const vec4 TAG_COLOR_LINK    = vec4( 72/255.0f,  95/255.0f, 199/255.0f, 1);
@@ -58,6 +58,5 @@ namespace Controls
 	void TagLink(const string &in text) { Tag(text, TAG_COLOR_LINK); }
 	void TagSuccess(const string &in text) { Tag(text, TAG_COLOR_SUCCESS); }
 	void TagWarning(const string &in text) { Tag(text, TAG_COLOR_WARNING); }
-	void TagDark(const string &in text) { Tag(text, TAG_COLOR_DARK); }
 	void TagDanger(const string &in text) { Tag(text, TAG_COLOR_DANGER); }
 }

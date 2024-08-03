@@ -278,11 +278,15 @@ class PluginTab : Tab
 
 		UI::TextDisabled("Version " + m_plugin.m_version.ToString() + " by " + m_plugin.GetAuthorNames());
 
+		Controls::PluginTags(m_plugin);
+
+		/*
 		for (uint i = 0; i < m_plugin.m_games.Length; i++) {
 			Controls::TagLink(m_plugin.m_games[i]);
 			UI::SameLine();
 		}
 		UI::NewLine();
+		*/
 
 		if (m_plugin.m_screenshots.Length > 0) {
 			UI::Separator();
@@ -320,8 +324,7 @@ class PluginTab : Tab
 							UI::Image(imgScreenshot.m_texture, dst);
 						}
 
-						if (UI::IsItemHovered()) {
-							UI::BeginTooltip();
+						if (UI::BeginItemTooltip()) {
 							UI::Image(imgScreenshot.m_texture, imgSize / 2.0f);
 							if (m_plugin.m_screenshotDescriptions[i].Length > 0) {
 								UI::TextWrapped(m_plugin.m_screenshotDescriptions[i]);
