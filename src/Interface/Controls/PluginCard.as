@@ -36,7 +36,7 @@ namespace Controls
 			// Draw an updatable tag on top of the image if it's installed and updatable
 			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
 				string text = Icons::ArrowCircleUp + " Update!";
-				DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_WARNING);
+				DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_LINK);
 				tagPos.y += tagRowHeight;
 
 				if(Setting_ChangelogTooltips) {
@@ -59,6 +59,14 @@ namespace Controls
 				UI::BeginTooltip();
 				UI::Text("This plugin is unsigned and requires developer mode.");
 				UI::EndTooltip();
+			}
+		}
+
+		// Draw tag for irregular signature types
+		if (plugin.m_signed) {
+			if (plugin.m_signType == "school") {
+				DrawTag(tagPos, Icons::University + " School Mode", Controls::TAG_COLOR_WARNING);
+				tagPos.y += tagRowHeight;
 			}
 		}
 

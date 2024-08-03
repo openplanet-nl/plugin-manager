@@ -15,6 +15,7 @@ class PluginInfo
 
 	uint m_filesize;
 	bool m_signed;
+	string m_signType;
 	bool m_broken;
 
 	int64 m_postTime;
@@ -27,7 +28,7 @@ class PluginInfo
 	array<string> m_screenshots;
 	array<string> m_screenshotDescriptions;
 
-	array<TagInfo@> m_tags;
+	array<string> m_games;
 	array<PluginChangelog@> m_changelogs;
 
 	bool m_isInstalled;
@@ -64,6 +65,7 @@ class PluginInfo
 
 		m_filesize = js["filesize"];
 		m_signed = js["signed"];
+		m_signType = js["signtype"];
 		m_broken = js["broken"];
 
 		m_postTime = js["posttime"];
@@ -85,9 +87,9 @@ class PluginInfo
 			}
 		}
 
-		auto jsTags = js["tags"];
-		for (uint i = 0; i < jsTags.Length; i++) {
-			m_tags.InsertLast(TagInfo(jsTags[i]));
+		auto jsGames = js["games"];
+		for (uint i = 0; i < jsGames.Length; i++) {
+			m_games.InsertLast(jsGames[i]);
 		}
 
 		CheckIfInstalled();

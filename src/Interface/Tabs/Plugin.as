@@ -278,8 +278,8 @@ class PluginTab : Tab
 
 		UI::TextDisabled("Version " + m_plugin.m_version.ToString() + " by " + m_plugin.GetAuthorNames());
 
-		for (uint i = 0; i < m_plugin.m_tags.Length; i++) {
-			Controls::PluginTag(m_plugin.m_tags[i]);
+		for (uint i = 0; i < m_plugin.m_games.Length; i++) {
+			Controls::TagLink(m_plugin.m_games[i]);
 			UI::SameLine();
 		}
 		UI::NewLine();
