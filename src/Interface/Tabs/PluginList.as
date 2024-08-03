@@ -18,8 +18,6 @@ class PluginListTab : Tab
 
 	void GetRequestTags(array<string>@ tags)
 	{
-		tags.InsertLast("Modern");
-
 #if TMNEXT || MPD
 		tags.InsertLast("Trackmania");
 #elif TURBO
