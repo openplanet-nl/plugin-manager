@@ -14,7 +14,7 @@ class PluginListTab : Tab
 
 	string GetLabel() override { return "Plugins"; }
 
-	vec4 GetColor() override { return vec4(0.2f, 0.2f, 0.2f, 0.7f); }
+	vec4 GetColor() override { return vec4(0.3f, 0.3f, 0.3f, 0.7f); }
 
 	void GetRequestTags(array<string>@ tags)
 	{
