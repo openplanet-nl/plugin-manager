@@ -172,9 +172,9 @@ class PluginListTab : Tab
 
 		if (Setting_ViewStyle == ViewStyle::Rows) {
 			if (UI::BeginTable("Plugins", 3, UI::TableFlags::RowBg)) {
-				UI::TableSetupColumn("##Image", UI::TableColumnFlags::WidthFixed, 95);
+				UI::TableSetupColumn("##Image", UI::TableColumnFlags::WidthFixed, 95 * UI::GetScale());
 				UI::TableSetupColumn("##Plugin");
-				UI::TableSetupColumn("##Actions", UI::TableColumnFlags::WidthFixed, 70);
+				UI::TableSetupColumn("##Actions", UI::TableColumnFlags::WidthFixed, 70 * UI::GetScale());
 				for (uint i = 0; i < m_plugins.Length; i++) {
 					Controls::PluginRow(m_plugins[i]);
 				}
@@ -182,8 +182,8 @@ class PluginListTab : Tab
 			}
 		} else {
 			if (UI::BeginTable("Plugins", Setting_PluginsPerRow, UI::TableColumnFlags::WidthStretch)) {
-				const float WINDOW_PADDING = 8;
-				const float COL_SPACING = 4;
+				const float WINDOW_PADDING = 8 * UI::GetScale();
+				const float COL_SPACING = 4 * UI::GetScale();
 				float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (Setting_PluginsPerRow - 1)) / float(Setting_PluginsPerRow);
 				for (uint i = 0; i < m_plugins.Length; i++) {
 					UI::TableNextColumn();
