@@ -17,6 +17,7 @@ class PluginInfo
 	bool m_signed;
 	string m_signType;
 	bool m_broken;
+	string m_adminNote;
 
 	int64 m_postTime;
 	int64 m_updateTime;
@@ -67,6 +68,7 @@ class PluginInfo
 		m_signed = js["signed"];
 		m_signType = js["signtype"];
 		m_broken = js["broken"];
+		m_adminNote = js["adminnote"];
 
 		m_postTime = js["posttime"];
 		m_updateTime = js["updatetime"];

@@ -340,6 +340,12 @@ class PluginTab : Tab
 
 		UI::Separator();
 
+		if (m_plugin.m_adminNote != "") {
+			Controls::BeginFrameDanger(Icons::ExclamationTriangle + " Note from Openplanet");
+			UI::Markdown(m_plugin.m_adminNote);
+			Controls::EndFrame();
+		}
+
 		UI::Markdown(m_plugin.m_description);
 
 		UI::Separator();

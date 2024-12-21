@@ -30,13 +30,13 @@ namespace Controls
 
 		// Draw an installed tag on top of the image if it's installed
 		if (plugin.m_isInstalled) {
-			DrawTag(tagPos, Icons::CheckCircle + " Installed", Controls::TAG_COLOR_PRIMARY);
+			DrawTag(tagPos, Icons::CheckCircle + " Installed", Controls::COLOR_PRIMARY);
 			tagPos.y += tagRowHeight;
 
 			// Draw an updatable tag on top of the image if it's installed and updatable
 			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
 				string text = Icons::ArrowCircleUp + " Update!";
-				DrawTagWithInvisButton(tagPos, windowPos, text, Controls::TAG_COLOR_LINK);
+				DrawTagWithInvisButton(tagPos, windowPos, text, Controls::COLOR_LINK);
 				tagPos.y += tagRowHeight;
 
 				UI::SetNextWindowSize(int(400 * scale), -1, UI::Cond::Always);
@@ -49,7 +49,7 @@ namespace Controls
 
 		// Draw tag when unsigned
 		if (!plugin.m_signed) {
-			DrawTagWithInvisButton(tagPos, windowPos, Icons::Code + " Unsigned", Controls::TAG_COLOR_DARK);
+			DrawTagWithInvisButton(tagPos, windowPos, Icons::Code + " Unsigned", Controls::COLOR_DARK);
 			tagPos.y += tagRowHeight;
 			UI::SetItemTooltip("This plugin is unsigned and requires Developer Mode.");
 		}
@@ -57,7 +57,7 @@ namespace Controls
 		// Draw tag for irregular signature types
 		if (plugin.m_signed) {
 			if (plugin.m_signType == "school") {
-				DrawTagWithInvisButton(tagPos, windowPos, Icons::University + " School Mode", Controls::TAG_COLOR_WARNING);
+				DrawTagWithInvisButton(tagPos, windowPos, Icons::University + " School Mode", Controls::COLOR_WARNING);
 				tagPos.y += tagRowHeight;
 				UI::SetItemTooltip("This plugin requires School Mode.");
 			}
@@ -65,7 +65,7 @@ namespace Controls
 
 		// Draw tag on broken plugins
 		if (plugin.m_broken) {
-			DrawTagWithInvisButton(tagPos, windowPos, Icons::ExclamationTriangle + " Broken", Controls::TAG_COLOR_DANGER);
+			DrawTagWithInvisButton(tagPos, windowPos, Icons::ExclamationTriangle + " Broken", Controls::COLOR_DANGER);
 			tagPos.y += tagRowHeight;
 			UI::SetItemTooltip("This plugin is been marked as broken! It may no longer be working as intended, might be broken, or might be very unstable.");
 		}
