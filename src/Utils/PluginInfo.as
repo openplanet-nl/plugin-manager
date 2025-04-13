@@ -13,7 +13,7 @@ class PluginInfo
 	string m_sourceURL;
 	string m_issuesURL;
 
-	uint m_filesize;
+	uint m_filesize; //NOTE: Currently always 0 - remains unused
 	bool m_signed;
 	string m_signType;
 	bool m_broken;
