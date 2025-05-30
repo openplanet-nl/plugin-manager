@@ -56,8 +56,9 @@ class PluginListTab : Tab
 
 	void StartRequest()
 	{
-		Clear();
-		StartRequestForPage(0);
+		if (m_pageCount == 0) {
+			StartRequestForPage(0);
+		}
 	}
 
 	void StartRequestForPage(int page)
@@ -170,6 +171,11 @@ class PluginListTab : Tab
 			return;
 		}
 
+		if (UI::Button(Icons::Repeat + " Refresh")) {
+			Clear();
+			StartRequestForPage(0);
+		}
+
 		if (Setting_ViewStyle == ViewStyle::Rows) {
 			if (UI::BeginTable("Plugins", 3, UI::TableFlags::RowBg)) {
 				UI::TableSetupColumn("##Image", UI::TableColumnFlags::WidthFixed, 95 * UI::GetScale());
@@ -191,6 +197,12 @@ class PluginListTab : Tab
 				}
 				UI::EndTable();
 			}
+		}
+
+		if (m_request !is null && !m_request.Finished() && m_pageCount > 0) {
+			UI::PushFont(g_fontBold);
+			UI::Text("\\$7f7Loading more items...\\$z");
+			UI::PopFont();
 		}
 
 		// Handle automatic page loading
