@@ -22,20 +22,18 @@ void PluginInstallAsync(int siteID, const string &in identifier, const Version &
 {
 	warn("Installing plugin with site ID " + siteID + " and identifier \"" + identifier + "\"");
 
-	// Start downloading the plugin
+	string savePath = IO::FromDataFolder("Plugins/" + identifier + ".op");
+
+	// Start downloading the plugin to disk
 	auto req = Net::HttpRequest();
 	req.Method = Net::HttpMethod::Get;
 	req.Url = Setting_BaseURL + "plugin/" + siteID + "/download";
-	req.Start();
+	req.StartToFile(savePath);
 
 	// Wait for the download to finish
 	while (!req.Finished()) {
 		yield();
 	}
-
-	// Save the file
-	string savePath = IO::FromDataFolder("Plugins/" + identifier + ".op");
-	req.SaveToFile(savePath);
 
 	if (load) {
 		// Load the plugin
