@@ -13,7 +13,6 @@ class PluginInfo
 	string m_sourceURL;
 	string m_issuesURL;
 
-	uint m_filesize; //NOTE: Currently always 0 - remains unused
 	bool m_signed;
 	string m_signType;
 	bool m_broken;
@@ -64,7 +63,6 @@ class PluginInfo
 			m_issuesURL = NullCoalesce(jsLinks["issues"]);
 		}
 
-		m_filesize = js["filesize"];
 		m_signed = js["signed"];
 		m_signType = js["signtype"];
 		m_broken = js["broken"];
