@@ -18,7 +18,7 @@ void PluginUninstallAsync(ref@ metaPlugin)
 	PluginCache::SyncRemove(pluginIdentifier);
 }
 
-void PluginInstallAsync(int siteID, const string &in identifier, const Version &in version, bool load = true)
+bool PluginInstallAsync(int siteID, const string &in identifier, const Version &in version, bool load = true)
 {
 	warn("Installing plugin with site ID " + siteID + " and identifier \"" + identifier + "\"");
 
@@ -35,12 +35,16 @@ void PluginInstallAsync(int siteID, const string &in identifier, const Version &
 		yield();
 	}
 
-	if (!IO::FileExists(savePath) || IO::FileSize(savePath) == 0) {
-		const string msg = "There was an error installing the plugin '" + identifier
-			+ ",' you should check your permissions! If you need help, you can join the Discord "
-			"through the menu at the top, " + Icons::QuestionCircle + " Help, " + Icons::DiscordAlt + " Join Discord";
+	if (IO::FileSize(savePath) == 0) {
+		const string msg = "Error installing plugin '" + identifier + "' ";
 		error(msg);
-		UI::ShowNotification(Icons::ShoppingCart + " Plugin Manager", msg, vec4(1.0f, 0.4f, 0.0f, 0.8f), 15000);
+		UI::ShowNotification(Icons::ShoppingCart + " Plugin Manager", msg, vec4(1.0f, 0.4f, 0.0f, 0.8f), 10000);
+
+		if (IO::FileExists(savePath)) {
+			IO::Delete(savePath);
+		}
+
+		return false;
 	}
 
 	if (load) {
@@ -54,6 +58,8 @@ void PluginInstallAsync(int siteID, const string &in identifier, const Version &
 			PluginCache::SyncUnloaded(identifier, siteID, version);
 		}
 	}
+
+	return true;
 }
 
 void PluginUpdateAsync(ref@ update)
