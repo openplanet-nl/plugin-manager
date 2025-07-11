@@ -1,5 +1,10 @@
 namespace PluginManager
 {
+	void PluginUninstall(Meta::Plugin@ plugin)
+	{
+		startnew(PluginUninstallAsync, plugin);
+	}
+
 	void PluginUninstallAsync(ref@ metaPlugin)
 	{
 		auto plugin = cast<Meta::Plugin>(metaPlugin);
