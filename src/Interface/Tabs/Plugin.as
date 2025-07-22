@@ -295,7 +295,7 @@ class PluginTab : Tab
 				const float WINDOW_PADDING = 8 * scale;
 				const float COL_SPACING = 4 * scale;
 
-				float colWidth = (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (SCREENSHOTS_PER_ROW - 1)) / float(SCREENSHOTS_PER_ROW);
+				float colWidth = Math::Max(1.0f, (UI::GetWindowSize().x - WINDOW_PADDING * 2 - COL_SPACING * (SCREENSHOTS_PER_ROW - 1)) / float(SCREENSHOTS_PER_ROW));
 				float colHeight = (270.0f / (480.0f / colWidth));
 
 				for (uint i = 0; i < m_plugin.m_screenshots.Length; i++) {
