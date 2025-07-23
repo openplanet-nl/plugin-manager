@@ -6,4 +6,5 @@ essential = true
 
 [script]
 dependencies = [ "Controls" ]
+exports = [ "src/Export.as" ]
 timeout = 0
