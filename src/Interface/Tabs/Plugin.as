@@ -120,7 +120,7 @@ class PluginTab : Tab
 	{
 		m_updating = true;
 
-		PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_id, m_plugin.m_version);
+		m_plugin.m_failedToInstall = !PluginInstallAsync(m_plugin.m_siteID, m_plugin.m_id, m_plugin.m_version);
 
 		m_plugin.m_downloads++;
 		m_plugin.CheckIfInstalled();
@@ -190,6 +190,16 @@ class PluginTab : Tab
 			if (UI::GreenButton(Icons::Download + " Install")) {
 				startnew(CoroutineFunc(InstallAsync));
 			}
+
+			if (m_plugin.m_failedToInstall) {
+				const string helpLink = "https://openplanet.dev/docs/help";
+				UI::SameLine();
+				if (UI::RedButton(Icons::QuestionCircle + " Troubleshooting")) {
+					OpenBrowserURL(helpLink);
+				}
+				UI::SetItemTooltip(helpLink);
+			}
+
 			return;
 		}
 
