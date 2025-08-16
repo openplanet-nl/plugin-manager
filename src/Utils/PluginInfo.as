@@ -18,6 +18,9 @@ class PluginInfo
 	bool m_broken;
 	string m_adminNote;
 
+	bool m_hasGenAI;
+	string m_genAIDescription;
+
 	int64 m_postTime;
 	int64 m_updateTime;
 	int m_downloads;
@@ -67,6 +70,9 @@ class PluginInfo
 		m_signType = js["signtype"];
 		m_broken = js["broken"];
 		m_adminNote = js["adminnote"];
+
+		m_hasGenAI = js["genai"];
+		m_genAIDescription = js["genaidescription"];
 
 		m_postTime = js["posttime"];
 		m_updateTime = js["updatetime"];

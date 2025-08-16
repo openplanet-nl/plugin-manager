@@ -250,6 +250,14 @@ class PluginTab : Tab
 		UI::Text("Last updated: \\$f77" + Time::FormatString("%F %R", m_plugin.m_updateTime));
 		UI::Text("Posted: \\$f77" + Time::FormatString("%F %R", m_plugin.m_postTime));
 
+		if (m_plugin.m_hasGenAI) {
+			Controls::BeginFrame("\\$ff7" + Icons::ExclamationCircle + "\\$z This plugin was developed using generative AI.");
+			if (m_plugin.m_genAIDescription != "") {
+				UI::Text("From the developer: " + m_plugin.m_genAIDescription);
+			}
+			Controls::EndFrame();
+		}
+
 		if (UI::Button(Icons::Link + " Open on website")) {
 			OpenBrowserURL(Setting_BaseURL + m_plugin.m_url);
 		}
