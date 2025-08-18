@@ -35,6 +35,7 @@ class PluginInfo
 	array<PluginChangelog@> m_changelogs;
 
 	bool m_isInstalled;
+	bool m_failedToInstall = false;
 
 	Net::HttpRequest@ m_changelogRequest;
 
@@ -108,6 +109,7 @@ class PluginInfo
 		// If the plugin is loaded, it's installed
 		if (GetInstalledPlugin() !is null) {
 			m_isInstalled = true;
+			m_failedToInstall = false;
 			return;
 		}
 
@@ -115,6 +117,7 @@ class PluginInfo
 		string path = IO::FromDataFolder("Plugins/" + m_id + ".op");
 		if (IO::FileExists(path)) {
 			m_isInstalled = true;
+			m_failedToInstall = false;
 			return;
 		}
 	}
