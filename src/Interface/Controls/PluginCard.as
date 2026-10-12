@@ -35,7 +35,7 @@ namespace Controls
 
 			// Draw an updatable tag on top of the image if it's installed and updatable
 			if (GetAvailableUpdate(plugin.m_siteID) !is null) {
-				string text = Icons::ArrowCircleUp + " Update!";
+				string text = Icons::InfoCircle + " Update available";
 				DrawTagWithInvisButton(tagPos, windowPos, text, Controls::COLOR_LINK);
 				tagPos.y += tagRowHeight;
 

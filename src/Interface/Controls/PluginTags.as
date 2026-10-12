@@ -12,7 +12,7 @@ namespace Controls
 
 		// Draw an updatable tag on top of the image if it's installed and updatable
 		if (GetAvailableUpdate(plugin.m_siteID) !is null) {
-			TagLink(Icons::ArrowCircleUp + " Update!");
+			TagLink(Icons::InfoCircle + " Update available");
 
 			UI::SetNextWindowSize(int(400 * scale), -1, UI::Cond::Always);
 			if(Setting_ChangelogTooltips && UI::BeginItemTooltip()) {
