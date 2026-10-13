@@ -67,7 +67,7 @@ namespace PluginCache
 		}
 		js["installed"] = jsInstalled;
 
-		Json::ToFile(pathInstalled, js);
+		Json::ToFile(pathInstalled, js, true);
 
 		if (Setting_VerboseLog) {
 			trace("Saved PluginCache.json");

@@ -83,6 +83,11 @@ void CheckForUpdatesAsync()
 			continue;
 		}
 
+		auto plugin = Meta::GetPluginFromSiteID(siteId);
+		if (plugin !is null && plugin.Type != Meta::PluginType::Zip) {
+			continue;
+		}
+
 		warn("New plugin update available for " + info.m_name + ": " + info.m_version.ToString() + " -> " + siteVersion);
 
 		UI::ShowNotification(

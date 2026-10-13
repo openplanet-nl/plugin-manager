@@ -1,6 +1,11 @@
 void PluginUninstallAsync(ref@ metaPlugin)
 {
 	auto plugin = cast<Meta::Plugin@>(metaPlugin);
+	if (plugin.Type != Meta::PluginType::Zip) {
+		warn("Can't uninstall plugin, not a zip: " + plugin.Name);
+		return;
+	}
+
 	string pluginSourcePath = plugin.SourcePath;
 	string pluginIdentifier = plugin.ID;
 
@@ -56,6 +61,11 @@ void PluginUpdateAsync(ref@ update)
 	// If the plugin is currently loaded
 	auto installedPlugin = Meta::GetPluginFromSiteID(au.m_siteID);
 	if (installedPlugin !is null) {
+		if (installedPlugin.Type != Meta::PluginType::Zip) {
+			warn("Unable to update plugin " + installedPlugin.Name + " because it is not a zip!");
+			return;
+		}
+
 		// Gather dependency index and start topological sort
 		auto index = Meta::PluginIndex();
 		index.AddTree(installedPlugin);
@@ -93,17 +103,25 @@ void UpdateAllPluginsAsync()
 	for (uint i = 0; i < g_availableUpdates.Length; i++) {
 		auto au = g_availableUpdates[i];
 		auto installedPlugin = Meta::GetPluginFromSiteID(au.m_siteID);
-		if (installedPlugin !is null) {
+		if (installedPlugin !is null && installedPlugin.Type == Meta::PluginType::Zip) {
 			index.AddTree(installedPlugin);
 		}
 	}
 	auto sortedPlugins = index.TopologicalSort();
+
+	uint[] removeIndices;
 
 	// Uninstall and install the new version of each plugin
 	for (uint i = 0; i < g_availableUpdates.Length; i++) {
 		auto au = g_availableUpdates[i];
 		auto installedPlugin = Meta::GetPluginFromSiteID(au.m_siteID);
 		if (installedPlugin !is null) {
+			if (installedPlugin.Type != Meta::PluginType::Zip) {
+				warn("Unable to update plugin " + installedPlugin.Name + " because it is not a zip!");
+				removeIndices.InsertLast(i);
+				continue;
+			}
+
 			// Uninstall the plugin (this will also unload dependents)
 			PluginUninstallAsync(installedPlugin);
 			@installedPlugin = null;
@@ -118,6 +136,10 @@ void UpdateAllPluginsAsync()
 			// Install and load the plugin
 			PluginInstallAsync(au.m_siteID, au.m_identifier, Version(au.m_newVersion));
 		}
+	}
+
+	for (uint i = 0; i < removeIndices.Length; i++) {
+		g_availableUpdates.RemoveAt(removeIndices[i]);
 	}
 
 	// Load all plugins in the sorted index
